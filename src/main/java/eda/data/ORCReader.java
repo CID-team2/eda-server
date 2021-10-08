@@ -1,19 +1,14 @@
 package eda.data;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.io.orc.OrcFile;
-import org.apache.hadoop.hive.ql.io.orc.OrcStruct;
 import org.apache.hadoop.hive.ql.io.orc.Reader;
 import org.apache.hadoop.hive.ql.io.orc.RecordReader;
-import org.apache.hadoop.hive.serde2.objectinspector.StandardStructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.Text;
 import org.apache.orc.OrcProto;
-import org.apache.orc.Reader.Options;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.util.Pair;
 
@@ -49,16 +44,11 @@ public class ORCReader {
                 .collect(Collectors.toList());
     }
 
-    public List<Object> readColumn(int columnIndex) throws IOException {
-        int numFields = readSchema().size();
-        boolean[] includes = new boolean[numFields + 1];
-        includes[columnIndex + 1] = true;
-        Options options = new Options().include(includes);
-        RecordReader records = reader.rowsOptions(options);
-
-        List<Object> result = new ArrayList<>();
+    public List<String> readColumn(String columnName) throws IOException {
+        List<String> result = new ArrayList<>();
+        RecordReader records = reader.rows();
         StructObjectInspector inspector = (StructObjectInspector)reader.getObjectInspector();
-        StructField structField = inspector.getAllStructFieldRefs().get(columnIndex);
+        StructField structField = inspector.getStructFieldRef(columnName);
         Object row = null;
         while(records.hasNext())
         {
