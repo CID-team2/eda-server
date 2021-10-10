@@ -25,8 +25,8 @@ public class FeatureDto {
                 .name(entity.getName())
                 .dataset_name(entity.getDataset().getName())
                 .column_name(entity.getColumnName())
-                .data_type(entity.getDataType())
-                .feature_type(entity.getFeatureType())
+                .data_type(entity.getDataType().name())
+                .feature_type(entity.getFeatureType().name())
                 .children(
                         entity.getChildren().stream()
                                 .map(FeatureDto::of)

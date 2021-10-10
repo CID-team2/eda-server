@@ -8,5 +8,5 @@ public class DatasetColumn {
     @Column(name = "_index")
     private int index;
     private String name;
-    private String dataType;
+    private DataType dataType;
 }

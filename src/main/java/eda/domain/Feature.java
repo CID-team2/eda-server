@@ -24,9 +24,9 @@ public class Feature {
 
     private String columnName;
 
-    private String dataType;
+    private DataType dataType;
 
-    private String featureType;
+    private FeatureType featureType;
 
     @ManyToOne
     @JoinColumn(name = "feature_view_id")
