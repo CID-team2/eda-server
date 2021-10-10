@@ -15,7 +15,6 @@ import org.springframework.data.util.Pair;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 // this reader does NOT work for nested types
@@ -23,25 +22,25 @@ public class ORCReader {
     private Reader reader;
 
     // resource_path: relative path to resources/ directory
-    public ORCReader(String resource_path) throws IOException {
+    public ORCReader(String resourcePath) throws IOException {
         Configuration conf = new Configuration();
 
-        ClassPathResource resource = new ClassPathResource(resource_path);
+        ClassPathResource resource = new ClassPathResource(resourcePath);
         reader = OrcFile.createReader(new Path(resource.getFile().getPath()), OrcFile.readerOptions(conf));
     }
 
     // returns List of Pair<FieldName, TypeName>
-    public List<Pair<String, String>> readSchema() throws IOException {
+    public List<Pair<String, String>> readSchema() {
         List<String> fieldNames = reader.getFileTail().getFooter().getTypesList().get(0).getFieldNamesList();
         List<String> typeNames = reader.getFileTail().getFooter().getTypesList().stream()
                 .skip(1)
                 .map(OrcProto.Type::getKind)
                 .map(OrcProto.Type.Kind::toString)
-                .collect(Collectors.toList());
+                .toList();
 
         return IntStream.range(0, fieldNames.size())
                 .mapToObj(i -> Pair.of(fieldNames.get(i), typeNames.get(i)))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<String> readColumn(String columnName) throws IOException {
@@ -54,7 +53,7 @@ public class ORCReader {
         {
             row = records.next(row);
             Object o = inspector.getStructFieldData(row, structField);
-            String value = o instanceof BytesWritable ? new String(((BytesWritable) o).copyBytes()) : o.toString();
+            String value = o instanceof BytesWritable bytesWritable ? new String(bytesWritable.copyBytes()) : o.toString();
             result.add(value);
         }
 

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -18,7 +17,7 @@ public class FeatureViewService {
     public List<FeatureViewDto> getFeatureViewList() {
         return featureViewRepository.findAll().stream()
                 .map(FeatureViewDto::of)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Optional<FeatureViewDto> getFeatureView(String featureViewName) {

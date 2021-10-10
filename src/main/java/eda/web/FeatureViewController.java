@@ -27,7 +27,7 @@ public class FeatureViewController {
     public List<String> getFeatureViewList() {
         return featureViewService.getFeatureViewList().stream()
                 .map(FeatureViewDto::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @GetMapping("/api/v1/feature-views/{featureViewName}")
