@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 
 // this reader does NOT work for nested types
 public class ORCReader {
-    private Reader reader;
+    private final Reader reader;
 
     // resource_path: relative path to resources/ directory
     public ORCReader(String resourcePath) throws IOException {

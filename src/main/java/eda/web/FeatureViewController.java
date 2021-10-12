@@ -38,14 +38,7 @@ public class FeatureViewController {
     @GetMapping("/api/v1/feature-views/{featureViewName}/statistics")
     public ResponseEntity<GetStatisticsResponseDto> getStatistics(@PathVariable String featureViewName,
                                                                   @RequestBody GetStatisticsRequestDto getStatisticsRequestDto) {
-        Optional<Map<String, Object>> basicStatistic = statisticsService.getStatistic(featureViewName,
-                getStatisticsRequestDto.getFeatures().get(0),
-                null);
-        return ResponseEntity.of(basicStatistic.map(stringObjectMap ->
-                GetStatisticsResponseDto.builder()
-                        .null_count(0)
-                        .statistics(Map.of("basic", stringObjectMap))
-                        .build()));
+        return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
     }
 
 

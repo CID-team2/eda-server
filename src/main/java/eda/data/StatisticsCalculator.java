@@ -1,16 +1,16 @@
 package eda.data;
 
-import org.springframework.stereotype.Component;
-
-import java.math.BigInteger;
 import java.util.*;
 
-@Component
 public class StatisticsCalculator {
+    private StatisticsCalculator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     // calculate mean, stdev
-    public <T extends Number> Map<String, Object> getNumericStatistics(List<T> values) {
+    public static <T extends Number> Map<String, Object> getNumericStatistics(List<T> values) {
         if (values.isEmpty())
-            return null;
+            return Map.of();
 
         int count = values.size();
         double sum = 0;
@@ -29,7 +29,7 @@ public class StatisticsCalculator {
     }
 
     // calculate min, max, quantiles
-    public <T extends Comparable<? super T>> Map<String, Object> getOrdinalStatistics(List<T> values) {
+    public static <T extends Comparable<? super T>> Map<String, Object> getOrdinalStatistics(List<T> values) {
         if (values.isEmpty())
             return Map.of();
 
@@ -50,7 +50,7 @@ public class StatisticsCalculator {
                 "q3", q3);
     }
 
-    public Object getMode(List<Object> values) {
+    public static Object getMode(List<Object> values) {
         if (values.isEmpty())
             return null;
 
