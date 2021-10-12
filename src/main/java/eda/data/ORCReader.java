@@ -23,10 +23,10 @@ public class ORCReader {
 
     // resource_path: relative path to resources/ directory
     public ORCReader(String resourcePath) throws IOException {
-        Configuration conf = new Configuration();
+            Configuration conf = new Configuration();
 
-        ClassPathResource resource = new ClassPathResource(resourcePath);
-        reader = OrcFile.createReader(new Path(resource.getFile().getPath()), OrcFile.readerOptions(conf));
+            ClassPathResource resource = new ClassPathResource(resourcePath);
+            reader = OrcFile.createReader(new Path(resource.getFile().getPath()), OrcFile.readerOptions(conf));
     }
 
     // returns List of Pair<FieldName, TypeName>

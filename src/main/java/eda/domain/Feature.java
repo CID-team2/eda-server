@@ -1,8 +1,13 @@
 package eda.domain;
 
+import eda.data.ORCReader;
 import lombok.Getter;
 
 import javax.persistence.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -35,4 +40,17 @@ public class Feature {
     @ElementCollection
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))
     private Set<String> tags;
+
+    public List<Object> readValues() {
+        List<String> valuesString;
+        try {
+            ORCReader orcReader = new ORCReader(dataset.getPath());
+            valuesString = orcReader.readColumn(columnName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
+        return dataType.convertStringList(valuesString);
+    }
 }
