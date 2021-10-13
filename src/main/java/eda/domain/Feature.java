@@ -3,14 +3,18 @@ package eda.domain;
 import eda.data.ORCReader;
 import eda.data.StatisticsCalculator;
 import eda.dto.StatisticRequestDto;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.NotImplementedException;
 
 import javax.persistence.*;
 import java.io.IOException;
 import java.util.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Builder
 @Entity
