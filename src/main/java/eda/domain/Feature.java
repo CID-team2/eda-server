@@ -3,6 +3,7 @@ package eda.domain;
 import eda.data.ORCReader;
 import eda.data.StatisticsCalculator;
 import eda.dto.StatisticRequestDto;
+import lombok.Builder;
 import lombok.Getter;
 import org.apache.commons.lang.NotImplementedException;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 @Getter
+@Builder
 @Entity
 public class Feature {
     @Id
@@ -32,10 +34,6 @@ public class Feature {
     private DataType dataType;
 
     private FeatureType featureType;
-
-    @ManyToOne
-    @JoinColumn(name = "feature_view_id")
-    private FeatureView featureView;
 
     @ElementCollection
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))

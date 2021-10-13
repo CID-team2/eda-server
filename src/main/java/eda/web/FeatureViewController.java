@@ -3,19 +3,17 @@ package eda.web;
 import eda.dto.FeatureViewDto;
 import eda.dto.GetStatisticsRequestDto;
 import eda.dto.GetStatisticsResponseDto;
+import eda.service.CannotCreateFeatureViewException;
 import eda.service.FeatureViewService;
 import eda.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -41,5 +39,16 @@ public class FeatureViewController {
         return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
     }
 
+    @PostMapping("/api/v1/feature-views")
+    public void createFeatureView(@RequestBody FeatureViewDto featureViewDto) {
+        featureViewService.createFeatureView(featureViewDto);
+    }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(CannotCreateFeatureViewException.class)
+    public Map<String, String> cannotCreateFeatureView(CannotCreateFeatureViewException e) {
+        Map<String, String> errorAttributes = new HashMap<>();
+        errorAttributes.put("message", e.getMessage());
+        return errorAttributes;
+    }
 }

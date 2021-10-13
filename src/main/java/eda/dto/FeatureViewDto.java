@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 @Builder
 @Getter
 public class FeatureViewDto {
-    private Long id;
-    private String name;
-    private Set<FeatureDto> features;
+    private final Long id;
+    private final String name;
+    private final Set<FeatureDto> features;
 
     public static FeatureViewDto of(FeatureView entity) {
         return FeatureViewDto.builder()
