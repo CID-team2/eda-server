@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,12 +36,12 @@ public class FeatureViewController {
 
     @GetMapping("/api/v1/feature-views/{featureViewName}/statistics")
     public ResponseEntity<GetStatisticsResponseDto> getStatistics(@PathVariable String featureViewName,
-                                                                  @RequestBody GetStatisticsRequestDto getStatisticsRequestDto) {
+                                                                  @RequestBody @Valid GetStatisticsRequestDto getStatisticsRequestDto) {
         return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
     }
 
     @PostMapping("/api/v1/feature-views")
-    public void createFeatureView(@RequestBody FeatureViewDto featureViewDto) {
+    public void createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
         featureViewService.createFeatureView(featureViewDto);
     }
 

@@ -3,11 +3,20 @@ package eda.dto;
 import lombok.Getter;
 import lombok.ToString;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @ToString
 @Getter
 public class GetStatisticsRequestDto {
-    List<String> features;
+    @NotNull
+    @Size(min = 1, max = 1)
+    List<@NotEmpty String> features;
+
+    @Valid
+    @Size(max = 0)
     List<StatisticRequestDto> statistics;
 }

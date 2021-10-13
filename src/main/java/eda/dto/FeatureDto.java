@@ -6,6 +6,8 @@ import eda.domain.Feature;
 import eda.domain.FeatureType;
 import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,12 +16,26 @@ import java.util.stream.Collectors;
 @Getter
 public class FeatureDto {
     private final Long id;
+
+    @NotBlank
     private final String name;
+
+    @NotBlank
     private final String dataset_name;
+
+    @NotBlank
     private final String column_name;
+
+    @NotBlank
     private final String data_type;
+
+    @NotBlank
     private final String feature_type;
+
+    @Valid
     private final Set<FeatureDto> children;
+
+    @Valid
     private final Set<String> tags;
 
     public static FeatureDto of(Feature entity) {
