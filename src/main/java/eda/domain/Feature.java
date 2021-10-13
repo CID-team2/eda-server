@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.NotImplementedException;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -29,8 +31,9 @@ public class Feature {
 
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "dataset_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Dataset dataset;
 
     private String columnName;

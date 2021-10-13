@@ -45,6 +45,15 @@ public class FeatureViewController {
         featureViewService.createFeatureView(featureViewDto);
     }
 
+    @DeleteMapping("/api/v1/feature-views/{featureViewName}")
+    public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
+        boolean result = featureViewService.deleteFeatureView(featureViewName);
+        if (result)
+            return ResponseEntity.ok(null);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(CannotCreateFeatureViewException.class)
     public Map<String, String> cannotCreateFeatureView(CannotCreateFeatureViewException e) {

@@ -43,6 +43,14 @@ public class FeatureViewService {
         featureViewRepository.save(featureView);
     }
 
+    public boolean deleteFeatureView(String featureViewName) {
+        Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
+        if (featureViewOptional.isEmpty())
+            return false;
+        featureViewRepository.delete(featureViewOptional.get());
+        return true;
+    }
+
     private FeatureView convertFeatureViewDto(FeatureViewDto featureViewDto) {
         return FeatureView.builder()
                 .name(featureViewDto.getName())
