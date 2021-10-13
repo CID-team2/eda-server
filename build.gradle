@@ -9,6 +9,17 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+
+    // dependency for apache hive
+    maven {
+        url "https://conjars.org/repo"
+    }
+}
+
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }
 
 dependencies {
@@ -16,13 +27,17 @@ dependencies {
     implementation('org.projectlombok:lombok')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation('com.h2database:h2')
-//    implementation('org.springframework.boot:spring-boot-starter-oauth2-client')
     implementation('org.springframework.session:spring-session-jdbc')
-//    implementation('org.mariadb.jdbc:mariadb-java-client')
-    implementation('org.modelmapper:modelmapper:2.4.0')
+    implementation('mysql:mysql-connector-java')
+    implementation('org.mariadb.jdbc:mariadb-java-client')
+    implementation('org.apache.hive:hive-exec:2.3.0') {
+        exclude group:'org.eclipse.jetty.aggregate', module: '*'
+        exclude group:'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
+    }
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.projectlombok:lombok')
+    testRuntimeOnly('mysql:mysql-connector-java')
 //    testImplementation('org.springframework.security:spring-security-test')
 
     annotationProcessor('org.projectlombok:lombok')
