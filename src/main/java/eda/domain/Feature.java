@@ -3,14 +3,22 @@ package eda.domain;
 import eda.data.ORCReader;
 import eda.data.StatisticsCalculator;
 import eda.dto.StatisticRequestDto;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang.NotImplementedException;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.IOException;
 import java.util.*;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Builder
 @Entity
 public class Feature {
     @Id
@@ -23,8 +31,9 @@ public class Feature {
 
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "dataset_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Dataset dataset;
 
     private String columnName;
@@ -32,10 +41,6 @@ public class Feature {
     private DataType dataType;
 
     private FeatureType featureType;
-
-    @ManyToOne
-    @JoinColumn(name = "feature_view_id")
-    private FeatureView featureView;
 
     @ElementCollection
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))

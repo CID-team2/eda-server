@@ -1,11 +1,14 @@
 package eda.domain;
 
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Builder
 @Entity
 public class FeatureView {
     @Id
@@ -14,6 +17,7 @@ public class FeatureView {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "featureView")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "feature_view_id")
     private Set<Feature> features;
 }

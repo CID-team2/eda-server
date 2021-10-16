@@ -4,15 +4,26 @@ import eda.domain.FeatureView;
 import lombok.Builder;
 import lombok.Getter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Builder
 @Getter
 public class FeatureViewDto {
-    private Long id;
-    private String name;
-    private Set<FeatureDto> features;
+    private final Long id;
+
+    @NotBlank
+    private final String name;
+
+    @Valid
+    @NotNull
+    @Size(min = 1)
+    private final Set<FeatureDto> features;
 
     public static FeatureViewDto of(FeatureView entity) {
         return FeatureViewDto.builder()

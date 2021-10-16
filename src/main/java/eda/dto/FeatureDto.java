@@ -1,23 +1,42 @@
 package eda.dto;
 
+import eda.domain.DataType;
+import eda.domain.Dataset;
 import eda.domain.Feature;
-import lombok.Builder;
-import lombok.Getter;
+import eda.domain.FeatureType;
+import lombok.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Builder
 @Getter
 public class FeatureDto {
-    private Long id;
-    private String name;
-    private String dataset_name;
-    private String column_name;
-    private String data_type;
-    private String feature_type;
-    private Set<FeatureDto> children;
-    private Set<String> tags;
+    private final Long id;
+
+    @NotBlank
+    private final String name;
+
+    @NotBlank
+    private final String dataset_name;
+
+    @NotBlank
+    private final String column_name;
+
+    @NotBlank
+    private final String data_type;
+
+    @NotBlank
+    private final String feature_type;
+
+    @Valid
+    private final Set<FeatureDto> children;
+
+    @Valid
+    private final Set<String> tags;
 
     public static FeatureDto of(Feature entity) {
         return FeatureDto.builder()
