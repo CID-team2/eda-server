@@ -23,4 +23,11 @@ public class Dataset extends BaseTimeEntity {
     @ElementCollection
     @CollectionTable(name = "dataset_column")
     private Set<DatasetColumn> columns;
+
+    @Getter
+    @Embeddable
+    public static class DatasetColumn {
+        private String name;
+        private DataType dataType;
+    }
 }
