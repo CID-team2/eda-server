@@ -21,12 +21,10 @@ import java.util.stream.IntStream;
 public class ORCReader {
     private final Reader reader;
 
-    // resource_path: relative path to resources/ directory
-    public ORCReader(String resourcePath) throws IOException {
+    // path: relative path to jar file (or current user) directory
+    public ORCReader(String path) throws IOException {
             Configuration conf = new Configuration();
-
-            ClassPathResource resource = new ClassPathResource(resourcePath);
-            reader = OrcFile.createReader(new Path(resource.getFile().getPath()), OrcFile.readerOptions(conf));
+            reader = OrcFile.createReader(new Path(path), OrcFile.readerOptions(conf));
     }
 
     // returns List of Pair<FieldName, TypeName>
