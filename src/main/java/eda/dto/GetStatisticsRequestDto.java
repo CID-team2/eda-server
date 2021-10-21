@@ -1,5 +1,6 @@
 package eda.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -10,6 +11,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @ToString
+@Builder
 @Getter
 public class GetStatisticsRequestDto {
     @NotNull
