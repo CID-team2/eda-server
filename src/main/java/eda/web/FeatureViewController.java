@@ -14,36 +14,36 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/feature-views")
 @RestController
 public class FeatureViewController {
     private final FeatureViewService featureViewService;
     private final StatisticsService statisticsService;
 
-    @GetMapping("/api/v1/feature-views")
+    @GetMapping
     public List<String> getFeatureViewList() {
         return featureViewService.getFeatureViewList().stream()
                 .map(FeatureViewDto::getName)
                 .toList();
     }
 
-    @GetMapping("/api/v1/feature-views/{featureViewName}")
+    @GetMapping("/{featureViewName}")
     public ResponseEntity<FeatureViewDto> getFeatureView(@PathVariable String featureViewName) {
         return ResponseEntity.of(featureViewService.getFeatureView(featureViewName));
     }
 
-    @GetMapping("/api/v1/feature-views/{featureViewName}/statistics")
+    @GetMapping("/{featureViewName}/statistics")
     public ResponseEntity<GetStatisticsResponseDto> getStatistics(@PathVariable String featureViewName,
                                                                   @RequestBody @Valid GetStatisticsRequestDto getStatisticsRequestDto) {
         return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
     }
 
-    @GetMapping("/api/v1/feature-views/{featureViewName}/statistic")
+    @GetMapping("/{featureViewName}/statistic")
     public ResponseEntity<GetStatisticsResponseDto> getStatistic(@PathVariable String featureViewName,
                                                                  @RequestParam String feature,
                                                                  @RequestParam(required = false) String statistic,
@@ -73,12 +73,12 @@ public class FeatureViewController {
         return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
     }
 
-    @PostMapping("/api/v1/feature-views")
+    @PostMapping
     public void createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
         featureViewService.createFeatureView(featureViewDto);
     }
 
-    @DeleteMapping("/api/v1/feature-views/{featureViewName}")
+    @DeleteMapping("/{featureViewName}")
     public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
         boolean result = featureViewService.deleteFeatureView(featureViewName);
         if (result)
