@@ -68,4 +68,55 @@ public class StatisticsCalculator {
         }
         return mode;
     }
+
+    // TODO: add methods
+    // Boxplot
+    // used double values because I need to compute IQR and find whiskers, which is impossible when it is Number
+    public static <T extends Number> Map<String, Object> getBoxplot(List<T> values) {
+        if (values.isEmpty())
+            return Map.of();
+
+        List<Double> valuesCopy = new ArrayList<>(values.size());
+        for (T value : values) valuesCopy.add(value.doubleValue());
+        Collections.sort(valuesCopy);
+        int count = valuesCopy.size();
+        double q1 = valuesCopy.get(count / 4);
+        double q2 = valuesCopy.get(count / 2);
+        double q3 = valuesCopy.get(count * 3 / 4);
+        double IQR = q3 - q1;
+        double lowerWhiskerLimit = q1 - 1.5 * IQR;
+        double upperWhiskerLimit = q3 + 1.5 * IQR;
+        double lowerWhisker = valuesCopy.get(0);
+        double upperWhisker = valuesCopy.get(count-1);
+        List<Double> lowerOutliers = new ArrayList<>();
+        List<Double> upperOutliers = new ArrayList<>();
+        Iterator<Double> copyIter = valuesCopy.iterator();
+        while (copyIter.hasNext()) {
+            double item = copyIter.next();
+            if (item >= lowerWhiskerLimit) {
+                lowerWhisker = item;
+                break;
+            }
+            else
+                lowerOutliers.add(item);
+        }
+        while (copyIter.hasNext()) {
+            double item = copyIter.next();
+            if (item <= upperWhiskerLimit)
+                upperWhisker = item;
+            else
+                upperOutliers.add(item);
+        }
+
+        return Map.of(
+                "lowerOutliers", lowerOutliers,
+                "lowerWhisker", lowerWhisker,
+                "q1", q1,
+                "q2", q2,
+                "q3", q3,
+                "upperWhisker", upperWhisker,
+                "upperOutliers", upperOutliers);
+    }
+    // histogram
+    // bar plot
 }
