@@ -10,6 +10,9 @@ RUN curl https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da94
 ENV JAVA_HOME /opt/jdk-16.0.2
 ENV PATH $PATH:$JAVA_HOME/bin
 
+# disable cache by giving the argument (with time)
+ARG CACHEBUST
+
 RUN git clone -b develop https://github.com/CID-team2/eda-server.git /opt/eda-server && \
     cd /opt/eda-server && \
     chmod +x gradlew && \
