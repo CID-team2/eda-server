@@ -1,4 +1,4 @@
-package eda.data;
+package eda.domain.data;
 
 import eda.domain.DataType;
 

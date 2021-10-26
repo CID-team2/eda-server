@@ -1,9 +1,9 @@
-package eda.data;
+package eda.domain.data;
 
 import java.util.*;
 
-public class StatisticsCalculator {
-    private StatisticsCalculator() {
+public class StatisticCalculator {
+    private StatisticCalculator() {
         throw new IllegalStateException("Utility class");
     }
 

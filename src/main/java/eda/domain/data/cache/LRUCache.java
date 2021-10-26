@@ -1,4 +1,4 @@
-package eda.data.cache;
+package eda.domain.data.cache;
 
 import java.util.HashMap;
 import java.util.Optional;

@@ -1,13 +1,8 @@
 package eda.domain;
 
-import eda.data.DataReader;
-import eda.data.StatisticsCalculator;
-import eda.dto.StatisticRequestDto;
 import lombok.*;
-import org.apache.commons.lang.NotImplementedException;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.util.*;

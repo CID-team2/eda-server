@@ -1,7 +1,7 @@
-package eda.data;
+package eda.domain.data;
 
-import eda.data.cache.Cache;
-import eda.data.cache.LRUCache;
+import eda.domain.data.cache.Cache;
+import eda.domain.data.cache.LRUCache;
 import eda.domain.DataType;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;

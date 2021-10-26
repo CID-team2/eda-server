@@ -1,4 +1,4 @@
-package eda.data.cache;
+package eda.domain.data.cache;
 
 class DoublyLinkedList <E> {
     private int size = 0;

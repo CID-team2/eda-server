@@ -1,4 +1,4 @@
-package eda.data;
+package eda.domain.data;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -9,7 +9,6 @@ import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.orc.OrcProto;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.util.Pair;
 
 import java.io.IOException;

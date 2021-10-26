@@ -1,7 +1,7 @@
 package eda.domain;
 
-import eda.data.DataReader;
-import eda.data.StatisticsCalculator;
+import eda.domain.data.DataReader;
+import eda.domain.data.StatisticCalculator;
 import eda.dto.StatisticRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -31,13 +31,13 @@ public class Statistic {
             case QUANTITATIVE:
                 if (feature.getDataType() == DataType.INT || feature.getDataType() == DataType.FLOAT) {
                     List<Number> valuesNumber = values.stream().map(Number.class::cast).toList();
-                    result.putAll(StatisticsCalculator.getNumericStatistics(valuesNumber));
+                    result.putAll(StatisticCalculator.getNumericStatistics(valuesNumber));
                 }
             case ORDINAL:
                 List<Comparable<Object>> valuesComparable = values.stream().map(v -> (Comparable<Object>) v).toList();
-                result.putAll(StatisticsCalculator.getOrdinalStatistics(valuesComparable));
+                result.putAll(StatisticCalculator.getOrdinalStatistics(valuesComparable));
             case CATEGORICAL:
-                result.put("mode", StatisticsCalculator.getMode(values));
+                result.put("mode", StatisticCalculator.getMode(values));
                 break;
             case CUSTOM:
                 break;
@@ -63,7 +63,7 @@ public class Statistic {
                 .filter(Objects::nonNull)
                 .toList();
         return switch (kind) {
-            case BOXPLOT -> StatisticsCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
+            case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
         };
     }
 
