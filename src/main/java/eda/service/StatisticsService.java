@@ -29,9 +29,10 @@ public class StatisticsService {
         int nullCount = statistic.getNullCount(feature);
         Map<String, Object> resultStatistics = new HashMap<>(Map.of("basic", statistic.getStatistic(feature)));
         for (StatisticRequestDto statisticRequestDto : statisticRequestDtos) {
-            Map<String, Object> result = statistic.getStatistic(feature, statisticRequestDto);
-            if (result != null) {
-                resultStatistics.put(statisticRequestDto.getName(), result);
+            try {
+                resultStatistics.put(statisticRequestDto.getName(), statistic.getStatistic(feature, statisticRequestDto));
+            } catch (UnsupportedOperationException e) {
+                throw new BadRequestException(e.getMessage());
             }
         }
 

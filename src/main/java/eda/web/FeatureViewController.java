@@ -4,7 +4,7 @@ import eda.dto.FeatureViewDto;
 import eda.dto.GetStatisticsRequestDto;
 import eda.dto.GetStatisticsResponseDto;
 import eda.dto.StatisticRequestDto;
-import eda.service.CannotCreateFeatureViewException;
+import eda.service.BadRequestException;
 import eda.service.FeatureViewService;
 import eda.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
@@ -88,10 +88,11 @@ public class FeatureViewController {
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(CannotCreateFeatureViewException.class)
-    public Map<String, String> cannotCreateFeatureView(CannotCreateFeatureViewException e) {
+    @ExceptionHandler({BadRequestException.class, UnsupportedOperationException.class})
+    public Map<String, String> badRequest(Exception e) {
         Map<String, String> errorAttributes = new HashMap<>();
         errorAttributes.put("message", e.getMessage());
         return errorAttributes;
     }
+
 }

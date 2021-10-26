@@ -37,7 +37,7 @@ public class FeatureViewService {
 
     public void createFeatureView(FeatureViewDto featureViewDto) {
         if (featureViewRepository.findByName(featureViewDto.getName()).isPresent())
-            throw new CannotCreateFeatureViewException("Feature view '%s' is already exist".formatted(featureViewDto.getName()));
+            throw new BadRequestException("Feature view '%s' is already exist".formatted(featureViewDto.getName()));
 
         FeatureView featureView = convertFeatureViewDto(featureViewDto);
         featureViewRepository.save(featureView);
@@ -65,7 +65,7 @@ public class FeatureViewService {
                         .collect(Collectors.toSet()))
                 .name(featureDto.getName())
                 .dataset(datasetRepository.findByName(featureDto.getDataset_name())
-                        .orElseThrow(() -> new CannotCreateFeatureViewException(
+                        .orElseThrow(() -> new BadRequestException(
                                 "Dataset '%s' is not exist".formatted(featureDto.getDataset_name()))))
                 .columnName(featureDto.getColumn_name())
                 .dataType(DataType.valueOf(featureDto.getData_type()))

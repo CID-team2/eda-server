@@ -50,10 +50,13 @@ public class Statistic {
         try {
             kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
         } catch (IllegalArgumentException e) {
-            return null;
+            throw new UnsupportedOperationException("'%s' is not supported".formatted(statisticRequestDto.getName()));
         }
         if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
-            return null;
+            throw new UnsupportedOperationException(
+                    "'%s' is not supported with DataType '%s', FeatureType '%s'".formatted(
+                            statisticRequestDto.getName(), feature.getDataType(), feature.getFeatureType()
+                    ));
 
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
                 feature.getDataType()).stream()
