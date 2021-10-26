@@ -1,7 +1,7 @@
 package eda.service;
 
 import eda.domain.Feature;
-import eda.domain.FeatureStatistics;
+import eda.domain.Statistic;
 import eda.dto.GetStatisticsRequestDto;
 import eda.dto.GetStatisticsResponseDto;
 import eda.dto.StatisticRequestDto;
@@ -14,7 +14,7 @@ import java.util.*;
 @Service
 public class StatisticsService {
     private final FeatureViewService featureViewService;
-    private final FeatureStatistics featureStatistics;
+    private final Statistic statistic;
 
     public Optional<GetStatisticsResponseDto> getStatistics(String featureViewName,
                                                             GetStatisticsRequestDto getStatisticsRequestDto) {
@@ -26,10 +26,10 @@ public class StatisticsService {
 
         List<StatisticRequestDto> statisticRequestDtos = getStatisticsRequestDto.getStatistics();
 
-        int nullCount = featureStatistics.getNullCount(feature);
-        Map<String, Object> resultStatistics = new HashMap<>(Map.of("basic", featureStatistics.getStatistic(feature)));
+        int nullCount = statistic.getNullCount(feature);
+        Map<String, Object> resultStatistics = new HashMap<>(Map.of("basic", statistic.getStatistic(feature)));
         for (StatisticRequestDto statisticRequestDto : statisticRequestDtos) {
-            resultStatistics.put(statisticRequestDto.getName(), featureStatistics.getStatistic(feature, statisticRequestDto));
+            resultStatistics.put(statisticRequestDto.getName(), statistic.getStatistic(feature, statisticRequestDto));
         }
 
         return Optional.of(GetStatisticsResponseDto.builder()

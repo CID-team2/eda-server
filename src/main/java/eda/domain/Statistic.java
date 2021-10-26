@@ -14,7 +14,7 @@ import java.util.Objects;
 
 @RequiredArgsConstructor
 @Component
-public class FeatureStatistics {
+public class Statistic {
     private final DataReader dataReader;
 
     public int getNullCount(Feature feature) {
