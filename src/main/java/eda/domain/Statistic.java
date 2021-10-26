@@ -4,13 +4,9 @@ import eda.data.DataReader;
 import eda.data.StatisticsCalculator;
 import eda.dto.StatisticRequestDto;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang.NotImplementedException;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Component
@@ -50,6 +46,43 @@ public class Statistic {
     }
 
     public Map<String, Object> getStatistic(Feature feature, StatisticRequestDto statisticRequestDto) {
-        throw new NotImplementedException();
+        Kind kind;
+        try {
+            kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+        if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
+            return null;
+
+        List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
+                feature.getDataType()).stream()
+                .filter(Objects::nonNull)
+                .toList();
+        return switch (kind) {
+            case BOXPLOT -> StatisticsCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
+        };
+    }
+
+    @RequiredArgsConstructor
+    enum Kind {
+        BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
+                Set.of(FeatureType.QUANTITATIVE));
+
+        private final Set<DataType> supportedDataTypes;
+        private final Set<FeatureType> supportedFeatureTypes;
+
+
+        public boolean supports(DataType dataType, FeatureType featureType) {
+            return supportDataType(dataType) && supportFeatureType(featureType);
+        }
+
+        public boolean supportDataType(DataType dataType) {
+            return supportedDataTypes.contains(dataType);
+        }
+
+        public boolean supportFeatureType(FeatureType featureType) {
+            return supportedFeatureTypes.contains(featureType);
+        }
     }
 }

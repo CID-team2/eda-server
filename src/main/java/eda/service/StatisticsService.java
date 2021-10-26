@@ -29,7 +29,10 @@ public class StatisticsService {
         int nullCount = statistic.getNullCount(feature);
         Map<String, Object> resultStatistics = new HashMap<>(Map.of("basic", statistic.getStatistic(feature)));
         for (StatisticRequestDto statisticRequestDto : statisticRequestDtos) {
-            resultStatistics.put(statisticRequestDto.getName(), statistic.getStatistic(feature, statisticRequestDto));
+            Map<String, Object> result = statistic.getStatistic(feature, statisticRequestDto);
+            if (result != null) {
+                resultStatistics.put(statisticRequestDto.getName(), result);
+            }
         }
 
         return Optional.of(GetStatisticsResponseDto.builder()
