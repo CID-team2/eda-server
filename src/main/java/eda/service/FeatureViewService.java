@@ -6,10 +6,7 @@ import eda.dto.FeatureViewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -60,8 +57,9 @@ public class FeatureViewService {
             return Optional.empty();
         FeatureView featureView = featureViewOptional.get();
         Map<String, List<String>> result = new HashMap<>();
+        Integer randomSeed = random ? new Random().nextInt() : null;
         for (Feature feature : featureView.getFeatures()) {
-            result.put(feature.getColumnName(), statistic.getExample(feature, count, random));
+            result.put(feature.getColumnName(), statistic.getExample(feature, count, randomSeed));
         }
         return Optional.of(result);
     }

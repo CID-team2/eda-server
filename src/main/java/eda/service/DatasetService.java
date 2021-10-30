@@ -7,10 +7,7 @@ import eda.dto.DatasetDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -35,8 +32,9 @@ public class DatasetService {
             return Optional.empty();
         Dataset dataset = datasetOptional.get();
         Map<String, List<String>> result = new HashMap<>();
+        Integer randomSeed = random ? new Random().nextInt() : null;
         for (Dataset.DatasetColumn column : dataset.getColumns()) {
-            result.put(column.getName(), statistic.getExample(dataset, column.getName(), count, random));
+            result.put(column.getName(), statistic.getExample(dataset, column.getName(), count, randomSeed));
         }
         return Optional.of(result);
     }

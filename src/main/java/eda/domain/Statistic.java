@@ -68,11 +68,12 @@ public class Statistic {
         };
     }
 
-    public List<String> getExample(Dataset dataset, String columnName, int count, boolean random) {
+    public List<String> getExample(Dataset dataset, String columnName, int count, Integer randomSeed) {
         List<Object> values = dataReader.read(dataset.getPath(), columnName, DataType.STRING);
         List<String> result = new ArrayList<>();
         final int size = Math.min(values.size(), count);
-        if (random) {
+        if (randomSeed != null) {
+            this.random.setSeed(randomSeed);
             for (int i = 0; i < size; i++) {
                 result.add((String) values.get(this.random.nextInt(size)));
             }
@@ -83,8 +84,8 @@ public class Statistic {
         return result;
     }
 
-    public List<String> getExample(Feature feature, int count, boolean random) {
-        return getExample(feature.getDataset(), feature.getColumnName(), count, random);
+    public List<String> getExample(Feature feature, int count, Integer randomSeed) {
+        return getExample(feature.getDataset(), feature.getColumnName(), count, randomSeed);
     }
 
     @RequiredArgsConstructor
