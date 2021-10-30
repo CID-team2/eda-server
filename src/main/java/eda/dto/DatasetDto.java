@@ -28,7 +28,7 @@ public class DatasetDto {
         public static DatasetColumnDto of(Dataset.DatasetColumn entity) {
             return DatasetColumnDto.builder()
                     .name(entity.getName())
-                    .data_type(entity.getDataType().name())
+                    .data_type(entity.getDataType() != null ? entity.getDataType().name() : "")
                     .build();
         }
     }
