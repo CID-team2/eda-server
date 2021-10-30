@@ -32,9 +32,33 @@ public class FeatureViewController {
                 .toList();
     }
 
+    @PostMapping
+    public void createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
+        featureViewService.createFeatureView(featureViewDto);
+    }
+
     @GetMapping("/{featureViewName}")
     public ResponseEntity<FeatureViewDto> getFeatureView(@PathVariable String featureViewName) {
         return ResponseEntity.of(featureViewService.getFeatureView(featureViewName));
+    }
+
+    @DeleteMapping("/{featureViewName}")
+    public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
+        boolean result = featureViewService.deleteFeatureView(featureViewName);
+        if (result)
+            return ResponseEntity.ok(null);
+        else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping("/{featureViewName}/example")
+    public ResponseEntity<Map<String, List<String>>> getFeatureViewExample(@PathVariable String featureViewName,
+                                                                           @RequestParam(required = false) Integer count,
+                                                                           @RequestParam(required = false) Boolean random) {
+        return ResponseEntity.of(featureViewService.getFeatureViewExample(featureViewName,
+                count != null ? count : 10,
+                random != null ? random : false
+                ));
     }
 
     @GetMapping("/{featureViewName}/statistics")
@@ -71,20 +95,6 @@ public class FeatureViewController {
                 .build();
 
         return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
-    }
-
-    @PostMapping
-    public void createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
-        featureViewService.createFeatureView(featureViewDto);
-    }
-
-    @DeleteMapping("/{featureViewName}")
-    public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
-        boolean result = featureViewService.deleteFeatureView(featureViewName);
-        if (result)
-            return ResponseEntity.ok(null);
-        else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

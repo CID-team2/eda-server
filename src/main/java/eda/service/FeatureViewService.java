@@ -6,7 +6,9 @@ import eda.dto.FeatureViewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 public class FeatureViewService {
     private final FeatureViewRepository featureViewRepository;
     private final DatasetRepository datasetRepository;
+    private final Statistic statistic;
 
     public List<FeatureViewDto> getFeatureViewList() {
         return featureViewRepository.findAll().stream()
@@ -49,6 +52,18 @@ public class FeatureViewService {
             return false;
         featureViewRepository.delete(featureViewOptional.get());
         return true;
+    }
+
+    public Optional<Map<String, List<String>>> getFeatureViewExample(String featureViewName, int count, boolean random) {
+        Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
+        if (featureViewOptional.isEmpty())
+            return Optional.empty();
+        FeatureView featureView = featureViewOptional.get();
+        Map<String, List<String>> result = new HashMap<>();
+        for (Feature feature : featureView.getFeatures()) {
+            result.put(feature.getColumnName(), statistic.getExample(feature, count, random));
+        }
+        return Optional.of(result);
     }
 
     private FeatureView convertFeatureViewDto(FeatureViewDto featureViewDto) {

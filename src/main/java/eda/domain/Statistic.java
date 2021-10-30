@@ -12,6 +12,7 @@ import java.util.*;
 @Component
 public class Statistic {
     private final DataReader dataReader;
+    private final Random random = new Random();
 
     public int getNullCount(Feature feature) {
         List<Object> valuesWithNull = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
@@ -65,6 +66,25 @@ public class Statistic {
         return switch (kind) {
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
         };
+    }
+
+    public List<String> getExample(Dataset dataset, String columnName, int count, boolean random) {
+        List<Object> values = dataReader.read(dataset.getPath(), columnName, DataType.STRING);
+        List<String> result = new ArrayList<>();
+        final int size = Math.min(values.size(), count);
+        if (random) {
+            for (int i = 0; i < size; i++) {
+                result.add((String) values.get(this.random.nextInt(size)));
+            }
+        }
+        else {
+            result = values.stream().limit(size).map(String.class::cast).toList();
+        }
+        return result;
+    }
+
+    public List<String> getExample(Feature feature, int count, boolean random) {
+        return getExample(feature.getDataset(), feature.getColumnName(), count, random);
     }
 
     @RequiredArgsConstructor
