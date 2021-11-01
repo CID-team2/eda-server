@@ -21,9 +21,10 @@ public class Statistic {
         return valuesWithNull.size() - values.size();
     }
 
-    // TODO: Implement this
     public int getNullCount(List<Feature> features) {
-        return 0;
+        List<List<Object>> valuesWithNull = readFeatures(features);
+        List<List<Object>> values = getNonnullRows(valuesWithNull);
+        return valuesWithNull.get(0).size() - values.get(0).size();
     }
 
     public Map<String, Object> getStatistic(Feature feature) {
@@ -80,12 +81,7 @@ public class Statistic {
         checkValidRequest(features, statisticRequestDto);
         Kind kind = Kind.valueOf(statisticRequestDto.getName());
 
-        List<List<Object>> values = new ArrayList<>();
-        for (Feature feature : features) {
-            List<Object> list = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
-                    feature.getDataType()).stream().toList();
-            values.add(list);
-        }
+        List<List<Object>> values = getNonnullRows(readFeatures(features));
 
         return switch (kind) {
             case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
@@ -132,6 +128,39 @@ public class Statistic {
                                 statisticRequestDto.getName(), feature.getDataType(), feature.getFeatureType()
                         ));
         }
+    }
+
+    private List<List<Object>> readFeatures(List<Feature> features) {
+        List<List<Object>> result = new ArrayList<>();
+        for (Feature feature : features) {
+            List<Object> list = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
+                    feature.getDataType());
+            result.add(list);
+        }
+        return result;
+    }
+
+    private List<List<Object>> getNonnullRows(List<List<Object>> values) {
+        List<List<Object>> result = new ArrayList<>();
+        for (int i = 0; i < values.size(); i++) {
+            result.add(new ArrayList<>());
+        }
+
+        for (int i = 0; i < values.get(0).size(); i++) {
+            boolean nonnull = true;
+            for (int j = 0; j < values.size(); j++) {
+                if (values.get(j).get(i) == null) {
+                    nonnull = false;
+                    break;
+                }
+            }
+            if (nonnull) {
+                for (int j = 0; j < values.size(); j++) {
+                    result.get(j).add(values.get(j).get(i));
+                }
+            }
+        }
+        return result;
     }
 
     @RequiredArgsConstructor
