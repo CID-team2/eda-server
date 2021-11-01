@@ -1,8 +1,6 @@
 package eda.web;
 
 import eda.dto.FeatureViewDto;
-import eda.dto.GetStatisticsRequestDto;
-import eda.dto.GetStatisticsResponseDto;
 import eda.dto.StatisticRequestDto;
 import eda.service.BadRequestException;
 import eda.service.FeatureViewService;
@@ -61,40 +59,30 @@ public class FeatureViewController {
                 ));
     }
 
-    @GetMapping("/{featureViewName}/statistics")
-    public ResponseEntity<GetStatisticsResponseDto> getStatistics(@PathVariable String featureViewName,
-                                                                  @RequestBody @Valid GetStatisticsRequestDto getStatisticsRequestDto) {
-        return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
-    }
-
     @GetMapping("/{featureViewName}/statistic")
-    public ResponseEntity<GetStatisticsResponseDto> getStatistic(@PathVariable String featureViewName,
-                                                                 @RequestParam String feature,
-                                                                 @RequestParam(required = false) String statistic,
-                                                                 HttpServletRequest req) {
+    public ResponseEntity<Map<String, Object>> getStatistic(@PathVariable String featureViewName,
+                                                            @RequestParam List<String> feature,
+                                                            @RequestParam(required = false) String statistic,
+                                                            HttpServletRequest req) {
         Map<String, String[]> params = req.getParameterMap();
         params = new HashMap<>(params);     // make params modifiable
         params.remove("feature");
         params.remove("statistic");
 
         // build getStatisticsRequestDto
-        List<StatisticRequestDto> statistics;
+        StatisticRequestDto statisticRequestDto;
         if (statistic == null) {
-            statistics = List.of();
+            statisticRequestDto = null;
         } else {
             Map<String, Object> convertedParams = new HashMap<>();
             params.forEach((k, v) -> convertedParams.put(k, v[0]));
-            statistics = List.of(StatisticRequestDto.builder()
+            statisticRequestDto = StatisticRequestDto.builder()
                     .name(statistic)
                     .params(convertedParams)
-                    .build());
+                    .build();
         }
-        GetStatisticsRequestDto getStatisticsRequestDto = GetStatisticsRequestDto.builder()
-                .features(List.of(feature))
-                .statistics(statistics)
-                .build();
 
-        return ResponseEntity.of(statisticsService.getStatistics(featureViewName, getStatisticsRequestDto));
+        return ResponseEntity.of(statisticsService.getStatistic(featureViewName, feature, statisticRequestDto));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

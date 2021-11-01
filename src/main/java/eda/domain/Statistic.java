@@ -21,6 +21,11 @@ public class Statistic {
         return valuesWithNull.size() - values.size();
     }
 
+    // TODO: Implement this
+    public int getNullCount(List<Feature> features) {
+        return 0;
+    }
+
     public Map<String, Object> getStatistic(Feature feature) {
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
                 feature.getDataType()).stream()
@@ -28,6 +33,7 @@ public class Statistic {
                 .toList();
 
         Map<String, Object> result = new HashMap<>();
+        result.put("null_count", getNullCount(feature));
         switch (feature.getFeatureType()) {
             case QUANTITATIVE:
                 if (feature.getDataType() == DataType.INT || feature.getDataType() == DataType.FLOAT) {
@@ -47,17 +53,8 @@ public class Statistic {
     }
 
     public Map<String, Object> getStatistic(Feature feature, StatisticRequestDto statisticRequestDto) {
-        Kind kind;
-        try {
-            kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new UnsupportedOperationException("'%s' is not supported".formatted(statisticRequestDto.getName()));
-        }
-        if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
-            throw new UnsupportedOperationException(
-                    "'%s' is not supported with DataType '%s', FeatureType '%s'".formatted(
-                            statisticRequestDto.getName(), feature.getDataType(), feature.getFeatureType()
-                    ));
+        checkValidRequest(List.of(feature), statisticRequestDto);
+        Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
 
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
                 feature.getDataType()).stream()
@@ -65,6 +62,34 @@ public class Statistic {
                 .toList();
         return switch (kind) {
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
+        };
+    }
+
+    public Map<String, Object> getStatistic(List<Feature> features) {
+        if (features.size() == 1)
+            return getStatistic(features.get(0));
+
+        return Map.of("null_count", getNullCount(features));
+    }
+
+    // TODO: Implement statistics for multiple features
+    public Map<String, Object> getStatistic(List<Feature> features, StatisticRequestDto statisticRequestDto) {
+        if (features.size() == 1)
+            return getStatistic(features.get(0), statisticRequestDto);
+
+        checkValidRequest(features, statisticRequestDto);
+        Kind kind = Kind.valueOf(statisticRequestDto.getName());
+
+        List<List<Object>> values = new ArrayList<>();
+        for (Feature feature : features) {
+            List<Object> list = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
+                    feature.getDataType()).stream().toList();
+            values.add(list);
+        }
+
+        return switch (kind) {
+            case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
+            default -> null;
         };
     }
 
@@ -88,6 +113,27 @@ public class Statistic {
         return getExample(feature.getDataset(), feature.getColumnName(), count, randomSeed);
     }
 
+    private void checkValidRequest(List<Feature> features, StatisticRequestDto statisticRequestDto)
+            throws UnsupportedOperationException {
+        Kind kind;
+
+        // check statistic exists
+        try {
+            kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException("'%s' is not supported".formatted(statisticRequestDto.getName()));
+        }
+
+        // check statistic is valid for all featureType and dataType
+        for (Feature feature : features) {
+            if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
+                throw new UnsupportedOperationException(
+                        "'%s' is not supported with DataType '%s', FeatureType '%s'".formatted(
+                                statisticRequestDto.getName(), feature.getDataType(), feature.getFeatureType()
+                        ));
+        }
+    }
+
     @RequiredArgsConstructor
     enum Kind {
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
@@ -95,7 +141,6 @@ public class Statistic {
 
         private final Set<DataType> supportedDataTypes;
         private final Set<FeatureType> supportedFeatureTypes;
-
 
         public boolean supports(DataType dataType, FeatureType featureType) {
             return supportDataType(dataType) && supportFeatureType(featureType);
