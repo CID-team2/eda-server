@@ -1,6 +1,10 @@
 EDA for Feature Store
 =====================
 
+API Reference
+---------------
+https://app.swaggerhub.com/apis/rorhcdream/EDA
+
 Build & Run
 -----------
 
