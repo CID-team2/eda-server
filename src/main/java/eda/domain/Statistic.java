@@ -63,6 +63,7 @@ public class Statistic {
                 .toList();
         return switch (kind) {
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
+            case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
     }
 
@@ -73,19 +74,21 @@ public class Statistic {
         return Map.of("null_count", getNullCount(features));
     }
 
-    // TODO: Implement statistics for multiple features
     public Map<String, Object> getStatistic(List<Feature> features, StatisticRequestDto statisticRequestDto) {
         if (features.size() == 1)
             return getStatistic(features.get(0), statisticRequestDto);
 
         checkValidRequest(features, statisticRequestDto);
-        Kind kind = Kind.valueOf(statisticRequestDto.getName());
+        Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
 
         List<List<Object>> values = getNonnullRows(readFeatures(features));
 
         return switch (kind) {
             case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
-            default -> null;
+            case CORR_MATRIX -> Map.of("matrix",
+                    StatisticCalculator.getCorrMatrix(values.stream()
+                            .map(l -> l.stream().map(Number.class::cast).toList())
+                            .toList()));
         };
     }
 
@@ -166,6 +169,8 @@ public class Statistic {
     @RequiredArgsConstructor
     enum Kind {
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
+                Set.of(FeatureType.QUANTITATIVE)),
+        CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),
                 Set.of(FeatureType.QUANTITATIVE));
 
         private final Set<DataType> supportedDataTypes;
