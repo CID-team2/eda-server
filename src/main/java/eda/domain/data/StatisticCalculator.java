@@ -119,4 +119,44 @@ public class StatisticCalculator {
     }
     // histogram
     // bar plot
+
+    private static <T extends Number> double getCovariance(List<T> values1, List<T> values2, double mean1, double mean2) {
+        if (values1.size() != values2.size())
+            throw new IllegalArgumentException("size is different - values1.size: %d, values2.size: %d".formatted(
+                    values1.size(), values2.size()
+            ));
+
+        final int size = values1.size();
+        double sum = 0;
+        for (int i = 0; i < size; i++) {
+            sum += values1.get(i).doubleValue() * values2.get(i).doubleValue();
+        }
+        return sum / size - mean1 * mean2;
+    }
+
+    public static <T extends Number> double[][] getCorrMatrix(List<List<T>> values) {
+        List<Double> means = new ArrayList<>();
+        List<Double> stdevs = new ArrayList<>();
+        for (List<T> list : values) {
+            Map<String, Object> numericStatistic = getNumericStatistics(list);
+            means.add((Double) numericStatistic.get("mean"));
+            stdevs.add((Double) numericStatistic.get("stdev"));
+        }
+
+        final int size = values.size();
+        double[][] result = new double[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = i; j < size; j++) {
+                if (i == j)
+                    result[i][j] = 1;
+                else {
+                    double cov = getCovariance(values.get(i), values.get(j), means.get(i), means.get(j));
+                    result[i][j] = cov / (stdevs.get(i) * stdevs.get(j));
+                    result[j][i] = result[i][j];
+                }
+            }
+        }
+
+        return result;
+    }
 }
