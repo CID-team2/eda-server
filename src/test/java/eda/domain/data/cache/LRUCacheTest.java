@@ -59,9 +59,8 @@ class LRUCacheTest {
     @Test
     void concurrent_no_data_loss() {
         // given
-        final int size = 1000;
-        final int cacheSize = 100;
-        final LRUCache<String, Integer> cache = new LRUCache<>(cacheSize);
+        final int size = 100;
+        final LRUCache<String, Integer> cache = new LRUCache<>(size);
 
         // when
         List<Thread> threads = IntStream.range(0, size)
@@ -77,10 +76,7 @@ class LRUCacheTest {
         }
 
         // then
-        for (int i = 0; i < size - cacheSize; i++) {
-            assertTrue(cache.get(Integer.toString(i)).isEmpty());
-        }
-        for (int i = size - cacheSize; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             assertTrue(cache.get(Integer.toString(i)).isPresent());
             assertEquals(i, cache.get(Integer.toString(i)).get());
         }
