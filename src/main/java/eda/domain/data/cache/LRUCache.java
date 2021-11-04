@@ -40,15 +40,35 @@ public class LRUCache <K, V> implements Cache<K, V> {
             if (size > maxSize)
                 throw new IllegalArgumentException("cache entry size is bigger than cache size");
 
-            while (this.size + size > maxSize) {
+            DoublyLinkedList.Node<CacheElement<K, V>> node = nodeHashMap.get(key);
+            if (node != null) {
+                final int sizeDelta = size - node.value.size;
+                if (this.size + sizeDelta > maxSize)
+                    evict(sizeDelta);
+                node.value = new CacheElement<>(key, value, size);
+                list.moveToFront(node);
+                this.size += sizeDelta;
+            }
+            else {
+                if (this.size + size > maxSize)
+                    evict(size);
+                node = list.pushFront(new CacheElement<>(key, value, size));
+                nodeHashMap.put(key, node);
+                this.size += size;
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+    }
+
+    private void evict(int needSize) {
+        lock.writeLock().lock();
+        try {
+            while (this.size + needSize > maxSize) {
                 CacheElement<K, V> e = list.popBack();
                 nodeHashMap.remove(e.key);
                 this.size -= e.size;
             }
-
-            DoublyLinkedList.Node<CacheElement<K, V>> node = list.pushFront(new CacheElement<>(key, value, size));
-            nodeHashMap.put(key, node);
-            this.size += size;
         } finally {
             lock.writeLock().unlock();
         }

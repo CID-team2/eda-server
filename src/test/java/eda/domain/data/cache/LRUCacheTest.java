@@ -57,6 +57,30 @@ class LRUCacheTest {
     }
 
     @Test
+    void put_same_key() {
+        // given
+        final LRUCache<String, Integer> cache = new LRUCache<>(3);
+
+        // when
+        cache.put("a", 1, 1);
+        cache.put("b", 2, 1);
+        cache.put("b", 3, 1);
+        cache.put("c", 4, 1);
+        cache.put("a", 5, 1);
+        Optional<Integer> valueA = cache.get("a");
+        Optional<Integer> valueB = cache.get("b");
+        Optional<Integer> valueC = cache.get("c");
+
+        // then
+        assertTrue(valueA.isPresent());
+        assertEquals(5, valueA.get());
+        assertTrue(valueB.isPresent());
+        assertEquals(3, valueB.get());
+        assertTrue(valueC.isPresent());
+        assertEquals(4, valueC.get());
+    }
+
+    @Test
     void concurrent_no_data_loss() {
         // given
         final int size = 100;
