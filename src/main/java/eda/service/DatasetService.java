@@ -1,6 +1,7 @@
 package eda.service;
 
 import eda.domain.Dataset;
+import eda.domain.DatasetColumn;
 import eda.domain.DatasetRepository;
 import eda.domain.Statistic;
 import eda.dto.DatasetDto;
@@ -33,7 +34,7 @@ public class DatasetService {
         Dataset dataset = datasetOptional.get();
         Map<String, List<String>> result = new HashMap<>();
         Integer randomSeed = random ? new Random().nextInt() : null;
-        for (Dataset.DatasetColumn column : dataset.getColumns()) {
+        for (DatasetColumn column : dataset.getColumns()) {
             result.put(column.getName(), statistic.getExample(dataset, column.getName(), count, randomSeed));
         }
         return Optional.of(result);

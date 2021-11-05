@@ -23,7 +23,6 @@ public class FeatureDto {
     @NotBlank
     private final String column_name;
 
-    @NotBlank
     private final String data_type;
 
     @NotBlank

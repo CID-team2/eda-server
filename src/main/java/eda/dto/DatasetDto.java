@@ -18,21 +18,6 @@ public class DatasetDto {
     private final String source;
     private final Set<DatasetColumnDto> columns;
 
-    @RequiredArgsConstructor
-    @Builder
-    @Getter
-    public static class DatasetColumnDto {
-        private final String name;
-        private final String data_type;
-
-        public static DatasetColumnDto of(Dataset.DatasetColumn entity) {
-            return DatasetColumnDto.builder()
-                    .name(entity.getName())
-                    .data_type(entity.getDataType() != null ? entity.getDataType().name() : "")
-                    .build();
-        }
-    }
-
     public static DatasetDto of(Dataset entity) {
         return DatasetDto.builder()
                 .id(entity.getId())
