@@ -1,9 +1,6 @@
 package eda.dto;
 
-import eda.domain.DataType;
-import eda.domain.Dataset;
 import eda.domain.Feature;
-import eda.domain.FeatureType;
 import lombok.*;
 
 import javax.validation.Valid;
@@ -53,5 +50,17 @@ public class FeatureDto {
                 )
                 .tags(entity.getTags())
                 .build();
+    }
+
+    public Set<FeatureDto> getChildren() {
+        if (children == null)
+            return Set.of();
+        else return children;
+    }
+
+    public Set<String> getTags() {
+        if (tags == null)
+            return Set.of();
+        else return tags;
     }
 }
