@@ -25,3 +25,19 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=eda
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8
+
+  worker:
+    image: clovafeast-eda-server:latest
+    container_name: worker
+    depends_on:
+      - mysql
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.datasource.url": "jdbc:mysql://mysql:3306/eda?useUnicode=true&characterEncoding=utf8&useSSL=false",
+            "spring.jpa.hibernate.ddl-auto": "update",
+            "spring.session.jdbc.initialize-schema": "always",
+
+            "spring.main.web-application-type": "none"
+            "worker.enabled": "true",
+            "worker.schedule.interval": "60000",
+          }'
