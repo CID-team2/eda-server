@@ -27,7 +27,7 @@ public class Statistic {
         return valuesWithNull.get(0).size() - values.get(0).size();
     }
 
-    public Map<String, Object> getStatistic(Feature feature) {
+    public Map<String, Object> getBasicStatistic(Feature feature) {
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
                 feature.getDataType()).stream()
                 .filter(Objects::nonNull)
@@ -62,14 +62,15 @@ public class Statistic {
                 .filter(Objects::nonNull)
                 .toList();
         return switch (kind) {
+            case BASIC -> getBasicStatistic(feature);
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
             case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
     }
 
-    public Map<String, Object> getStatistic(List<Feature> features) {
+    public Map<String, Object> getBasicStatistic(List<Feature> features) {
         if (features.size() == 1)
-            return getStatistic(features.get(0));
+            return getBasicStatistic(features.get(0));
 
         return Map.of("null_count", getNullCount(features));
     }
@@ -84,6 +85,7 @@ public class Statistic {
         List<List<Object>> values = getNonnullRows(readFeatures(features));
 
         return switch (kind) {
+            case BASIC -> getBasicStatistic(features);
             case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
             case CORR_MATRIX -> Map.of("matrix",
                     StatisticCalculator.getCorrMatrix(values.stream()
@@ -168,6 +170,8 @@ public class Statistic {
 
     @RequiredArgsConstructor
     enum Kind {
+        BASIC(Set.of(DataType.values()),
+                Set.of(FeatureType.values())),
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
                 Set.of(FeatureType.QUANTITATIVE)),
         CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),

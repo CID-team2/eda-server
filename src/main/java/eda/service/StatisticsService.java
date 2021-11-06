@@ -25,7 +25,7 @@ public class StatisticsService {
         }
 
         if (statisticRequestDto == null) {
-            return Optional.of(statistic.getStatistic(features));
+            return Optional.of(statistic.getBasicStatistic(features));
         }
         else {
             try {
