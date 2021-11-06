@@ -12,7 +12,7 @@ import java.util.*;
 @Getter
 @Builder
 @Entity
-public class Feature {
+public class Feature extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

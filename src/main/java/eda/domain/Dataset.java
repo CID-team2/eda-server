@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-public class Dataset extends BaseTimeEntity {
+public class Dataset {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;

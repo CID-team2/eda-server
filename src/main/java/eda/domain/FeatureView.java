@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 @Builder
 @Entity
-public class FeatureView {
+public class FeatureView extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
