@@ -25,14 +25,18 @@ public class StatisticsService {
         }
 
         if (statisticRequestDto == null) {
-            return Optional.of(statistic.getBasicStatistic(features));
+            statisticRequestDto = StatisticRequestDto.builder()
+                    .name("basic")
+                    .build();
         }
-        else {
-            try {
+
+        try {
+            if (features.size() == 1)
+                return Optional.of(statistic.getStatisticFromEntity(features.get(0), statisticRequestDto));
+            else
                 return Optional.of(statistic.getStatistic(features, statisticRequestDto));
-            } catch (UnsupportedOperationException e) {
-                throw new BadRequestException(e.getMessage());
-            }
+        } catch (UnsupportedOperationException e) {
+            throw new BadRequestException(e.getMessage());
         }
     }
 }

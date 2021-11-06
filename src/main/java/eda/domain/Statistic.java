@@ -13,6 +13,7 @@ import java.util.*;
 @Component
 public class Statistic {
     private final DataReader dataReader;
+    private final StatisticEntityRepository statisticEntityRepository;
     private final Random random = new Random();
 
     public int getNullCount(Feature feature) {
@@ -93,6 +94,23 @@ public class Statistic {
                             .map(l -> l.stream().map(Number.class::cast).toList())
                             .toList()));
         };
+    }
+
+    public Map<String, Object> getStatisticFromEntity(Feature feature, StatisticRequestDto statisticRequestDto) {
+        Map<String, Object> params = statisticRequestDto.getParams();
+        if (params != null && !params.isEmpty())
+            return getStatistic(feature, statisticRequestDto);
+
+        Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
+        Optional<StatisticEntity> statisticEntityOptional =
+                statisticEntityRepository.get(feature.getColumn(), feature.getFeatureType(), kind);
+        if (statisticEntityOptional.isEmpty())
+            return getStatistic(feature, statisticRequestDto);
+
+        StatisticEntity statisticEntity = statisticEntityOptional.get();
+        Map<String, Object> result = new HashMap<>(statisticEntity.getValue());
+        result.put("calculated_at", statisticEntity.getModifiedAt());
+        return result;
     }
 
     public List<String> getExample(Dataset dataset, String columnName, int count, Integer randomSeed) {
