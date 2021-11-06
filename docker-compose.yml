@@ -39,5 +39,5 @@ services:
 
             "spring.main.web-application-type": "none"
             "worker.enabled": "true",
-            "worker.schedule.interval": "60000",
+            "worker.schedule.interval": "86400000",
           }'
