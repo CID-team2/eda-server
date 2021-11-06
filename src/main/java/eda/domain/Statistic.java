@@ -3,6 +3,7 @@ package eda.domain;
 import eda.domain.data.DataReader;
 import eda.domain.data.StatisticCalculator;
 import eda.dto.StatisticRequestDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,13 @@ public class Statistic {
         return result;
     }
 
+    public Map<String, Object> getBasicStatistic(List<Feature> features) {
+        if (features.size() == 1)
+            return getBasicStatistic(features.get(0));
+
+        return Map.of("null_count", getNullCount(features));
+    }
+
     public Map<String, Object> getStatistic(Feature feature, StatisticRequestDto statisticRequestDto) {
         checkValidRequest(List.of(feature), statisticRequestDto);
         Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
@@ -66,13 +74,6 @@ public class Statistic {
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
             case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
-    }
-
-    public Map<String, Object> getBasicStatistic(List<Feature> features) {
-        if (features.size() == 1)
-            return getBasicStatistic(features.get(0));
-
-        return Map.of("null_count", getNullCount(features));
     }
 
     public Map<String, Object> getStatistic(List<Feature> features, StatisticRequestDto statisticRequestDto) {
@@ -168,17 +169,22 @@ public class Statistic {
         return result;
     }
 
+    @Getter
     @RequiredArgsConstructor
-    enum Kind {
+    public enum Kind {
         BASIC(Set.of(DataType.values()),
-                Set.of(FeatureType.values())),
+                Set.of(FeatureType.values()),
+                Set.of(Type.values())),
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
-                Set.of(FeatureType.QUANTITATIVE)),
+                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.SINGLE)),
         CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),
-                Set.of(FeatureType.QUANTITATIVE));
+                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.MULTIPLE));
 
         private final Set<DataType> supportedDataTypes;
         private final Set<FeatureType> supportedFeatureTypes;
+        private final Set<Type> type;
 
         public boolean supports(DataType dataType, FeatureType featureType) {
             return supportDataType(dataType) && supportFeatureType(featureType);
@@ -190,6 +196,10 @@ public class Statistic {
 
         public boolean supportFeatureType(FeatureType featureType) {
             return supportedFeatureTypes.contains(featureType);
+        }
+
+        public enum Type {
+            SINGLE, MULTIPLE;
         }
     }
 }
