@@ -35,6 +35,7 @@ dependencies {
         exclude group:'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
     }
     implementation('org.springframework.boot:spring-boot-starter-validation')
+    implementation('com.vladmihalcea:hibernate-types-52:2.14.0')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.projectlombok:lombok')

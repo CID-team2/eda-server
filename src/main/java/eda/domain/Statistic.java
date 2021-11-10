@@ -3,6 +3,7 @@ package eda.domain;
 import eda.domain.data.DataReader;
 import eda.domain.data.StatisticCalculator;
 import eda.dto.StatisticRequestDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,7 @@ import java.util.*;
 @Component
 public class Statistic {
     private final DataReader dataReader;
+    private final StatisticEntityRepository statisticEntityRepository;
     private final Random random = new Random();
 
     public int getNullCount(Feature feature) {
@@ -27,7 +29,7 @@ public class Statistic {
         return valuesWithNull.get(0).size() - values.get(0).size();
     }
 
-    public Map<String, Object> getStatistic(Feature feature) {
+    public Map<String, Object> getBasicStatistic(Feature feature) {
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
                 feature.getDataType()).stream()
                 .filter(Objects::nonNull)
@@ -53,6 +55,13 @@ public class Statistic {
         return result;
     }
 
+    public Map<String, Object> getBasicStatistic(List<Feature> features) {
+        if (features.size() == 1)
+            return getBasicStatistic(features.get(0));
+
+        return Map.of("null_count", getNullCount(features));
+    }
+
     public Map<String, Object> getStatistic(Feature feature, StatisticRequestDto statisticRequestDto) {
         checkValidRequest(List.of(feature), statisticRequestDto);
         Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
@@ -62,16 +71,10 @@ public class Statistic {
                 .filter(Objects::nonNull)
                 .toList();
         return switch (kind) {
+            case BASIC -> getBasicStatistic(feature);
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
             case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
-    }
-
-    public Map<String, Object> getStatistic(List<Feature> features) {
-        if (features.size() == 1)
-            return getStatistic(features.get(0));
-
-        return Map.of("null_count", getNullCount(features));
     }
 
     public Map<String, Object> getStatistic(List<Feature> features, StatisticRequestDto statisticRequestDto) {
@@ -84,12 +87,30 @@ public class Statistic {
         List<List<Object>> values = getNonnullRows(readFeatures(features));
 
         return switch (kind) {
+            case BASIC -> getBasicStatistic(features);
             case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
             case CORR_MATRIX -> Map.of("matrix",
                     StatisticCalculator.getCorrMatrix(values.stream()
                             .map(l -> l.stream().map(Number.class::cast).toList())
                             .toList()));
         };
+    }
+
+    public Map<String, Object> getStatisticFromEntity(Feature feature, StatisticRequestDto statisticRequestDto) {
+        Map<String, Object> params = statisticRequestDto.getParams();
+        if (params != null && !params.isEmpty())
+            return getStatistic(feature, statisticRequestDto);
+
+        Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
+        Optional<StatisticEntity> statisticEntityOptional =
+                statisticEntityRepository.get(feature.getColumn(), feature.getFeatureType(), kind);
+        if (statisticEntityOptional.isEmpty())
+            return getStatistic(feature, statisticRequestDto);
+
+        StatisticEntity statisticEntity = statisticEntityOptional.get();
+        Map<String, Object> result = new HashMap<>(statisticEntity.getValue());
+        result.put("calculated_at", statisticEntity.getModifiedAt());
+        return result;
     }
 
     public List<String> getExample(Dataset dataset, String columnName, int count, Integer randomSeed) {
@@ -166,15 +187,22 @@ public class Statistic {
         return result;
     }
 
+    @Getter
     @RequiredArgsConstructor
-    enum Kind {
+    public enum Kind {
+        BASIC(Set.of(DataType.values()),
+                Set.of(FeatureType.values()),
+                Set.of(Type.values())),
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
-                Set.of(FeatureType.QUANTITATIVE)),
+                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.SINGLE)),
         CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),
-                Set.of(FeatureType.QUANTITATIVE));
+                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.MULTIPLE));
 
         private final Set<DataType> supportedDataTypes;
         private final Set<FeatureType> supportedFeatureTypes;
+        private final Set<Type> type;
 
         public boolean supports(DataType dataType, FeatureType featureType) {
             return supportDataType(dataType) && supportFeatureType(featureType);
@@ -186,6 +214,10 @@ public class Statistic {
 
         public boolean supportFeatureType(FeatureType featureType) {
             return supportedFeatureTypes.contains(featureType);
+        }
+
+        public enum Type {
+            SINGLE, MULTIPLE;
         }
     }
 }

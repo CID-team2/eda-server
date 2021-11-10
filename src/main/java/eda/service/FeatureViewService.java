@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class FeatureViewService {
     private final FeatureViewRepository featureViewRepository;
     private final DatasetRepository datasetRepository;
+    private final DatasetColumnRepository datasetColumnRepository;
     private final Statistic statistic;
 
     public List<FeatureViewDto> getFeatureViewList() {
@@ -73,15 +74,21 @@ public class FeatureViewService {
     }
 
     private Feature convertFeatureDto(FeatureDto featureDto) {
+        final String datasetName = featureDto.getDataset_name();
+        final String columnName = featureDto.getColumn_name();
+        final Dataset dataset = datasetRepository.findByName(datasetName)
+                .orElseThrow(() -> new BadRequestException(
+                        "Dataset '%s' does not exist".formatted(datasetName)));
+        final DatasetColumn datasetColumn = datasetColumnRepository.findByDatasetAndColumnName(datasetName, columnName)
+                .orElseThrow(() -> new BadRequestException(
+                        "DatasetColumn '%s' in Dataset '%s' does not exist".formatted(datasetName, columnName)));
+
         return Feature.builder()
                 .children(featureDto.getChildren().stream().map(this::convertFeatureDto)
                         .collect(Collectors.toSet()))
                 .name(featureDto.getName())
-                .dataset(datasetRepository.findByName(featureDto.getDataset_name())
-                        .orElseThrow(() -> new BadRequestException(
-                                "Dataset '%s' is not exist".formatted(featureDto.getDataset_name()))))
-                .columnName(featureDto.getColumn_name())
-                .dataType(DataType.valueOf(featureDto.getData_type()))
+                .dataset(dataset)
+                .column(datasetColumn)
                 .featureType(FeatureType.valueOf(featureDto.getFeature_type()))
                 .tags(featureDto.getTags())
                 .build();

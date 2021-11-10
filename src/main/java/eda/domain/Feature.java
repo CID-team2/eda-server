@@ -12,7 +12,7 @@ import java.util.*;
 @Getter
 @Builder
 @Entity
-public class Feature {
+public class Feature extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,17 +28,23 @@ public class Feature {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Dataset dataset;
 
-    private String columnName;
+    @ManyToOne
+    @JoinColumn(name = "dataset_column_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private DatasetColumn column;
 
-    private DataType dataType;
-
+    @Enumerated(EnumType.STRING)
     private FeatureType featureType;
 
     @ElementCollection
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))
     private Set<String> tags;
 
+    public DataType getDataType() {
+        return column.getDataType();
+    }
 
-
-
+    public String getColumnName() {
+        return column.getName();
+    }
 }

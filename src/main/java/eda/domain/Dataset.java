@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Getter
 @Entity
-public class Dataset extends BaseTimeEntity {
+public class Dataset {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
@@ -20,14 +20,7 @@ public class Dataset extends BaseTimeEntity {
 
     private String source;
 
-    @ElementCollection
-    @CollectionTable(name = "dataset_column")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dataset_id")
     private Set<DatasetColumn> columns;
-
-    @Getter
-    @Embeddable
-    public static class DatasetColumn {
-        private String name;
-        private DataType dataType;
-    }
 }
