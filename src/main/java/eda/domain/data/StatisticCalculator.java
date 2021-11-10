@@ -141,9 +141,9 @@ public class StatisticCalculator {
         List<Double> high_outliers = new ArrayList<>();
         int bin = 0;
         for (double value: doubleValues) {
-            if (value < boundaries.get(bin)) low_outliers.add(value);
+            if (bin == 0 && value < boundaries.get(bin)) low_outliers.add(value);
             else {
-                while (value < boundaries.get(bin) && bin < breaks) bin++;
+                while (value >= boundaries.get(bin+1) && bin < breaks) bin++;
                 if (bin < breaks && value >= boundaries.get(bin)) numbers.set(bin, numbers.get(bin)+1);
                 else if (bin == breaks && value == boundaries.get(bin)) numbers.set(bin-1, numbers.get(bin-1)+1);
                 else high_outliers.add(value);
