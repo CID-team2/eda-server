@@ -36,6 +36,7 @@ dependencies {
     }
     implementation('org.springframework.boot:spring-boot-starter-validation')
     implementation('com.vladmihalcea:hibernate-types-52:2.14.0')
+    implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.9')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.projectlombok:lombok')
