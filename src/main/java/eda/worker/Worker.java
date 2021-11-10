@@ -57,16 +57,18 @@ public class Worker {
 
     private void saveStatistic(DatasetColumn column, FeatureType featureType, Statistic.Kind kind, Map<String, Object> value) {
         Optional<StatisticEntity> statisticEntityOptional = statisticEntityRepository.get(column, featureType, kind);
+        StatisticEntity statisticEntity;
         if (statisticEntityOptional.isPresent()) {
-            statisticEntityOptional.get().setValue(value);
+            statisticEntity = statisticEntityOptional.get();
+            statisticEntity.setValue(value);
         } else {
-            StatisticEntity statisticEntity = StatisticEntity.builder()
+            statisticEntity = StatisticEntity.builder()
                     .column(column)
                     .featureType(featureType)
                     .kind(kind)
                     .value(value)
                     .build();
-            statisticEntityRepository.save(statisticEntity);
         }
+        statisticEntityRepository.save(statisticEntity);
     }
 }
