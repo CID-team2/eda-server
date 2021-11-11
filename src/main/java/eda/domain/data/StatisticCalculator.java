@@ -118,6 +118,46 @@ public class StatisticCalculator {
                 "upperOutliers", upperOutliers);
     }
     // histogram
+    public static <T extends Number> Map<String, Object> getHistogram(List<T> values, double start, double end, int breaks) {
+        // 1. convert to double and 2. sort
+        List<Double> doubleValues = new ArrayList<>(values.size());
+        for (T value: values) doubleValues.add(value.doubleValue());
+        Collections.sort(doubleValues);
+
+        // 3. calculate boundaries array
+        List<Double> boundaries = new ArrayList<>(breaks+1);
+        double width = (end - start) / breaks;
+        for (int i = 0; i < breaks; i++) {
+            boundaries.add(start + width * i);
+        }
+        boundaries.add(end);
+
+        // 4. initialize numbers array
+        List<Integer> numbers = new ArrayList<>(breaks);
+        for (int i = 0; i < breaks; i++) numbers.add(0);
+
+        // 5. count and save outliers
+        List<Double> low_outliers = new ArrayList<>();
+        List<Double> high_outliers = new ArrayList<>();
+        int bin = 0;
+        for (double value: doubleValues) {
+            if (bin == 0 && value < boundaries.get(bin)) low_outliers.add(value);
+            else {
+                while (bin < breaks && value >= boundaries.get(bin+1)) bin++;
+                if (bin < breaks && value >= boundaries.get(bin)) numbers.set(bin, numbers.get(bin)+1);
+                else if (bin == breaks && value == boundaries.get(bin)) numbers.set(bin-1, numbers.get(bin-1)+1);
+                else high_outliers.add(value);
+            }
+        }
+
+        // 6. return
+        return Map.of(
+                "boundaries", boundaries,
+                "numbers", numbers,
+                "low_outliers", low_outliers,
+                "high_outliers", high_outliers
+        );
+    }
     // bar plot
 
     private static <T extends Number> double getCovariance(List<T> values1, List<T> values2, double mean1, double mean2) {
