@@ -37,7 +37,7 @@ services:
             "spring.jpa.hibernate.ddl-auto": "update",
             "spring.session.jdbc.initialize-schema": "always",
 
-            "spring.main.web-application-type": "none"
+            "spring.main.web-application-type": "none",
             "worker.enabled": "true",
-            "worker.schedule.interval": "86400000",
+            "worker.schedule.interval": "86400000"
           }'
