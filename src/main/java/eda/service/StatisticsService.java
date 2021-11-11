@@ -35,7 +35,7 @@ public class StatisticsService {
                 return Optional.of(statistic.getStatisticFromEntity(features.get(0), statisticRequestDto));
             else
                 return Optional.of(statistic.getStatistic(features, statisticRequestDto));
-        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage());
         }
     }
