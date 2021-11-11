@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Null;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -70,9 +71,22 @@ public class Statistic {
                 feature.getDataType()).stream()
                 .filter(Objects::nonNull)
                 .toList();
+        final Map<String, Object> params = Optional.ofNullable(statisticRequestDto.getParams()).orElse(Map.of());
+
+        if (values.isEmpty())
+            return Map.of("error", "all values are null");
+
         return switch (kind) {
             case BASIC -> getBasicStatistic(feature);
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
+            case HISTOGRAM -> {
+                Map<String, Object> basic = getBasicStatistic(feature);
+                double start = ((Number) params.getOrDefault("start", basic.get("min"))).doubleValue();
+                double end = ((Number) params.getOrDefault("end", basic.get("max"))).doubleValue();
+                int breaks = (int) params.getOrDefault("breaks", 10);
+                yield StatisticCalculator.getHistogram(
+                    values.stream().map(Number.class::cast).toList(), start, end, breaks);
+            }
             case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
     }
@@ -88,7 +102,7 @@ public class Statistic {
 
         return switch (kind) {
             case BASIC -> getBasicStatistic(features);
-            case BOXPLOT -> throw new UnsupportedOperationException("Boxplot is for single feature");
+            case BOXPLOT, HISTOGRAM -> throw new UnsupportedOperationException(kind.name() + " is for single feature");
             case CORR_MATRIX -> Map.of("matrix",
                     StatisticCalculator.getCorrMatrix(values.stream()
                             .map(l -> l.stream().map(Number.class::cast).toList())
@@ -194,6 +208,9 @@ public class Statistic {
                 Set.of(FeatureType.values()),
                 Set.of(Type.values())),
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
+                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.SINGLE)),
+        HISTOGRAM(Set.of(DataType.INT, DataType.FLOAT),
                 Set.of(FeatureType.QUANTITATIVE),
                 Set.of(Type.SINGLE)),
         CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),
