@@ -143,7 +143,7 @@ public class StatisticCalculator {
         for (double value: doubleValues) {
             if (bin == 0 && value < boundaries.get(bin)) low_outliers.add(value);
             else {
-                while (value >= boundaries.get(bin+1) && bin < breaks) bin++;
+                while (bin < breaks && value >= boundaries.get(bin+1)) bin++;
                 if (bin < breaks && value >= boundaries.get(bin)) numbers.set(bin, numbers.get(bin)+1);
                 else if (bin == breaks && value == boundaries.get(bin)) numbers.set(bin-1, numbers.get(bin-1)+1);
                 else high_outliers.add(value);
