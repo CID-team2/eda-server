@@ -80,13 +80,14 @@ public class Statistic {
             case BASIC -> getBasicStatistic(feature);
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
             case HISTOGRAM -> {
-                Map<String, Object> basic = getBasicStatistic(feature);
+                Map<String, Object> boxplot =
+                        getStatisticFromEntity(feature, StatisticRequestDto.builder().name("boxplot").build());
                 double start;
                 double end;
                 int breaks;
                 try {
-                    start = Double.parseDouble((String) params.getOrDefault("start", basic.get("min").toString()));
-                    end = Double.parseDouble((String) params.getOrDefault("end", basic.get("max").toString()));
+                    start = Double.parseDouble((String) params.getOrDefault("start", boxplot.get("lowerWhisker").toString()));
+                    end = Double.parseDouble((String) params.getOrDefault("end", boxplot.get("upperWhisker").toString()));
                     breaks = Integer.parseInt((String) params.getOrDefault("breaks", "10"));
                 } catch (NullPointerException | NumberFormatException e) {
                     throw new IllegalArgumentException("Cannot parse request param: " + e.getMessage());
