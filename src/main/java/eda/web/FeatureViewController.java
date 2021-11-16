@@ -85,6 +85,13 @@ public class FeatureViewController {
         return ResponseEntity.of(statisticsService.getStatistic(featureViewName, feature, statisticRequestDto));
     }
 
+    @GetMapping("/{featureViewName}/statistic/check")
+    public ResponseEntity<Boolean> checkStatistic(@PathVariable String featureViewName,
+                                                  @RequestParam List<String> feature,
+                                                  @RequestParam String statistic) {
+        return ResponseEntity.of(statisticsService.checkStatistic(featureViewName, feature, statistic));
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({BadRequestException.class, UnsupportedOperationException.class})
     public Map<String, String> badRequest(Exception e) {
@@ -92,5 +99,4 @@ public class FeatureViewController {
         errorAttributes.put("message", e.getMessage());
         return errorAttributes;
     }
-
 }

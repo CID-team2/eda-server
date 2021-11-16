@@ -64,7 +64,7 @@ public class Statistic {
     }
 
     public Map<String, Object> getStatistic(Feature feature, StatisticRequestDto statisticRequestDto) {
-        checkValidRequest(List.of(feature), statisticRequestDto);
+        checkValidRequest(List.of(feature), statisticRequestDto.getName());
         Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
 
         List<Object> values = dataReader.read(feature.getDataset().getPath(), feature.getColumnName(),
@@ -103,7 +103,7 @@ public class Statistic {
         if (features.size() == 1)
             return getStatistic(features.get(0), statisticRequestDto);
 
-        checkValidRequest(features, statisticRequestDto);
+        checkValidRequest(features, statisticRequestDto.getName());
         Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
 
         List<List<Object>> values = getNonnullRows(readFeatures(features));
@@ -155,15 +155,15 @@ public class Statistic {
         return getExample(feature.getDataset(), feature.getColumnName(), count, randomSeed);
     }
 
-    private void checkValidRequest(List<Feature> features, StatisticRequestDto statisticRequestDto)
+    public void checkValidRequest(List<Feature> features, String statistic)
             throws UnsupportedOperationException {
         Kind kind;
 
         // check statistic exists
         try {
-            kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
+            kind = Kind.valueOf(statistic.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new UnsupportedOperationException("'%s' is not supported".formatted(statisticRequestDto.getName()));
+            throw new UnsupportedOperationException("'%s' is not supported".formatted(statistic));
         }
 
         // check statistic is valid for all featureType and dataType
@@ -171,7 +171,7 @@ public class Statistic {
             if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
                 throw new UnsupportedOperationException(
                         "'%s' is not supported with DataType '%s', FeatureType '%s'".formatted(
-                                statisticRequestDto.getName(), feature.getDataType(), feature.getFeatureType()
+                                statistic, feature.getDataType(), feature.getFeatureType()
                         ));
         }
     }

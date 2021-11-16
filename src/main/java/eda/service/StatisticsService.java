@@ -39,4 +39,21 @@ public class StatisticsService {
             throw new BadRequestException(e.getMessage());
         }
     }
+
+    public Optional<Boolean> checkStatistic(String featureViewName, List<String> featureNames, String statisticName) {
+        List<Feature> features = new ArrayList<>();
+        for (String featureName : featureNames) {
+            Optional<Feature> featureOptional = featureViewService.getFeature(featureViewName, featureName);
+            if (featureOptional.isEmpty())
+                return Optional.empty();
+            features.add(featureOptional.get());
+        }
+
+        try {
+            statistic.checkValidRequest(features, statisticName);
+        } catch (UnsupportedOperationException e) {
+            return Optional.of(false);
+        }
+        return Optional.of(true);
+    }
 }
