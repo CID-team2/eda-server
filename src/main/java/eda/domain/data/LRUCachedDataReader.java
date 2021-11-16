@@ -13,18 +13,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Primary
 @Component
 public class LRUCachedDataReader implements DataReader {
     static final int DEFAULT_CACHE_SIZE = (int) 1e8;
 
-    Cache<CacheKey, List<Object>> cache;
+    private Cache<CacheKey, List<Object>> cache;
 
-    LRUCachedDataReader() {
+    public LRUCachedDataReader() {
         cache = new LRUCache<>(DEFAULT_CACHE_SIZE);
     }
 
-    LRUCachedDataReader(int size) {
+    public LRUCachedDataReader(int size) {
         cache = new LRUCache<>(size);
     }
 
@@ -46,6 +45,10 @@ public class LRUCachedDataReader implements DataReader {
         List<Object> values = dataType.convertStringList(valuesString);
         cache.put(key, values, calculateSize(valuesString, dataType));
         return values;
+    }
+
+    public void clearCache() {
+        cache.clear();
     }
 
     private int calculateSize(List<String> values, DataType dataType) {

@@ -1,6 +1,7 @@
 package eda.worker;
 
 import eda.domain.*;
+import eda.domain.data.LRUCachedDataReader;
 import eda.dto.StatisticRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +23,12 @@ public class Worker {
     private final DatasetColumnRepository columnRepository;
     private final StatisticEntityRepository statisticEntityRepository;
     private final Statistic statistic;
+    private final LRUCachedDataReader dataReader;
 
     @Scheduled(fixedRateString = "${worker.schedule.interval:86400000}")
     public void precalculateStatistics() {
+        dataReader.clearCache();
+
         List<DatasetColumn> columnList = columnRepository.findAll();
         for (DatasetColumn column : columnList) {
             for (FeatureType featureType : FeatureType.values()) {
