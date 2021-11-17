@@ -50,7 +50,13 @@ public class ORCReader {
         {
             row = records.next(row);
             Object o = inspector.getStructFieldData(row, structField);
-            String value = o instanceof BytesWritable bytesWritable ? new String(bytesWritable.copyBytes()) : o.toString();
+            String value;
+            if (o == null)
+                value = "";
+            else if (o instanceof BytesWritable bytesWritable)
+                value = new String(bytesWritable.copyBytes());
+            else
+                value = o.toString();
             result.add(value);
         }
 
