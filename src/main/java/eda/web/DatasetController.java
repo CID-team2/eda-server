@@ -35,4 +35,9 @@ public class DatasetController {
                 random != null ? random : false
                 ));
     }
+
+    @PostMapping
+    public boolean createDataset(@RequestParam String name, @RequestParam String fileName) {
+        return datasetService.createDataset(name, fileName);
+    }
 }
