@@ -1,6 +1,7 @@
 package eda.domain;
 
 import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvParser;
 import eda.domain.data.ORCWriter;
@@ -52,7 +53,12 @@ public class Dataset {
 
     public static Dataset createFromCSV(String datasetName, String source, InputStream input) throws IOException {
         String newPath = "data/%s.orc".formatted(datasetName);
-        ColumnData[] columns = readColumnsFromCSV(input);
+        ColumnData[] columns;
+        try {
+            columns = readColumnsFromCSV(input);
+        } catch (RuntimeJsonMappingException e) {
+            throw new IOException(e.toString());
+        }
 
         ORCWriter writer = new ORCWriter(newPath);
         List<String> header = Arrays.stream(columns).map(ColumnData::name).toList();

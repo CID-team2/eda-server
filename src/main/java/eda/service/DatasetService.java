@@ -6,8 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 
 @RequiredArgsConstructor
 @Service
@@ -26,11 +28,18 @@ public class DatasetService {
                 .map(DatasetDto::of);
     }
 
-    public void createDatasetFromRemoteCSV(String datasetName, String url) {
+    public void createDatasetFromRemoteCSV(String datasetName, String url, String fileFormat) {
         if (datasetRepository.findByName(datasetName).isPresent())
             throw new BadRequestException("Dataset '%s' already exists".formatted(datasetName));
         try {
-            Dataset dataset = Dataset.createFromCSV(datasetName, url, new URL(url).openStream());
+            InputStream stream;
+            if (fileFormat == null)
+                stream = new URL(url).openStream();
+            else if (fileFormat.equalsIgnoreCase("gz"))
+                stream = new GZIPInputStream(new URL(url).openStream());
+            else
+                throw new BadRequestException("Unsupported file format: %s".formatted(fileFormat));
+            Dataset dataset = Dataset.createFromCSV(datasetName, url, stream);
             datasetRepository.save(dataset);
         } catch (IOException e) {
             throw new BadRequestException("Cannot create dataset - " + e.toString());

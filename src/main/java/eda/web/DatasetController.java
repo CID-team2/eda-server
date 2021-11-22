@@ -40,8 +40,9 @@ public class DatasetController {
     }
 
     @PostMapping
-    public void createDatasetFromRemoteCSV(@RequestParam String name, @RequestParam String url) {
-        datasetService.createDatasetFromRemoteCSV(name, url);
+    public void createDatasetFromRemoteCSV(@RequestParam String name, @RequestParam String url,
+                                           @RequestParam(required = false, value = "file_format") String fileFormat) {
+        datasetService.createDatasetFromRemoteCSV(name, url, fileFormat);
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
