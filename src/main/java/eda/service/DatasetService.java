@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -25,15 +26,15 @@ public class DatasetService {
                 .map(DatasetDto::of);
     }
 
-    public boolean createDataset(String datasetName, String csvFileName) {
+    public void createDatasetFromRemoteCSV(String datasetName, String url) {
+        if (datasetRepository.findByName(datasetName).isPresent())
+            throw new BadRequestException("Dataset '%s' already exists".formatted(datasetName));
         try {
-            Dataset dataset = Dataset.createDatasetFromCSV(datasetName, csvFileName);
+            Dataset dataset = Dataset.createFromCSV(datasetName, url, new URL(url).openStream());
             datasetRepository.save(dataset);
         } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            throw new BadRequestException("Cannot create dataset - " + e.toString());
         }
-        return true;
     }
 
     public Optional<Map<String, List<String>>> getDatasetExample(String datasetName, int count, boolean random) {

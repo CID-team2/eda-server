@@ -1,11 +1,14 @@
 package eda.web;
 
 import eda.dto.DatasetDto;
+import eda.service.BadRequestException;
 import eda.service.DatasetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +40,15 @@ public class DatasetController {
     }
 
     @PostMapping
-    public boolean createDataset(@RequestParam String name, @RequestParam String fileName) {
-        return datasetService.createDataset(name, fileName);
+    public void createDatasetFromRemoteCSV(@RequestParam String name, @RequestParam String url) {
+        datasetService.createDatasetFromRemoteCSV(name, url);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({BadRequestException.class})
+    public Map<String, String> badRequest(Exception e) {
+        Map<String, String> errorAttributes = new HashMap<>();
+        errorAttributes.put("message", e.getMessage());
+        return errorAttributes;
     }
 }

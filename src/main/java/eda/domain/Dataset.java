@@ -11,7 +11,11 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 @AllArgsConstructor
@@ -46,9 +50,9 @@ public class Dataset {
         columns.add(datasetColumn);
     }
 
-    public static Dataset createDatasetFromCSV(String datasetName, String path) throws IOException {
+    public static Dataset createFromCSV(String datasetName, String source, InputStream input) throws IOException {
         String newPath = "data/%s.orc".formatted(datasetName);
-        ColumnData[] columns = readColumnsFromCSV(path);
+        ColumnData[] columns = readColumnsFromCSV(input);
 
         ORCWriter writer = new ORCWriter(newPath);
         List<String> header = Arrays.stream(columns).map(ColumnData::name).toList();
@@ -58,7 +62,7 @@ public class Dataset {
         Dataset dataset = Dataset.builder()
                 .name(datasetName)
                 .path(newPath)
-                .source(path)
+                .source(source)
                 .build();
         for (ColumnData column : columns) {
             dataset.addColumn(column.name, column.dataType);
@@ -66,11 +70,10 @@ public class Dataset {
         return dataset;
     }
 
-    private static ColumnData[] readColumnsFromCSV(String path) throws IOException {
-        File csvFile = new File(path);
+    private static ColumnData[] readColumnsFromCSV(InputStream stream) throws IOException {
         CsvMapper mapper = new CsvMapper();
         mapper.enable(CsvParser.Feature.WRAP_AS_ARRAY);
-        MappingIterator<String[]> it = mapper.readerFor(String[].class).readValues(csvFile);
+        MappingIterator<String[]> it = mapper.readerFor(String[].class).readValues(stream);
 
         // read header and set data list
         String[] header = it.next();
