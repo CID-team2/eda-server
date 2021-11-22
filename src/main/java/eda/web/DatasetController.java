@@ -40,9 +40,22 @@ public class DatasetController {
     }
 
     @PostMapping
-    public void createDatasetFromRemoteCSV(@RequestParam String name, @RequestParam String url,
-                                           @RequestParam(required = false, value = "file_format") String fileFormat) {
-        datasetService.createDatasetFromRemoteCSV(name, url, fileFormat);
+    public DatasetDto createDatasetFromRemoteCSV(
+            @RequestParam String name, @RequestParam String url,
+            @RequestParam(required = false, value = "file_format") String fileFormat,
+            @RequestParam(required = false, value = "additional_column") String[] additionalColumns,
+            @RequestParam(required = false, value = "additional_value") String[] additionalValues) {
+        return datasetService.createDatasetFromRemoteCSV(name, url, fileFormat, additionalColumns, additionalValues);
+    }
+
+    @PatchMapping("/{datasetName}")
+    public ResponseEntity<DatasetDto> updateDatasetFromRemoteCSV(
+            @PathVariable String datasetName, @RequestParam String url,
+            @RequestParam(required = false, value = "file_format") String fileFormat,
+            @RequestParam(required = false, value = "additional_column") String[] additionalColumns,
+            @RequestParam(required = false, value = "additional_value") String[] additionalValues) {
+        return ResponseEntity.of(
+                datasetService.updateDatasetFromRemoteCSV(datasetName, url, fileFormat, additionalColumns, additionalValues));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -49,4 +49,16 @@ public class ORCWriter {
             }
         }
     }
+
+    public static void merge(String outputPath, List<String> header, List<String> inputFiles) throws IOException {
+        Configuration conf = new Configuration();
+        TypeDescription schema = TypeDescription.createStruct();
+        for (String columnName : header) {
+            schema.addField(columnName, TypeDescription.createString());
+        }
+
+        OrcFile.mergeFiles(new Path(outputPath),
+                OrcFile.writerOptions(conf).setSchema(schema),
+                inputFiles.stream().map(Path::new).toList());
+    }
 }

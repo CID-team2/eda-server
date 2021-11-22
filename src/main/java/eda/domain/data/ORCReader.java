@@ -42,24 +42,28 @@ public class ORCReader {
 
     public List<String> readColumn(String columnName) throws IOException {
         List<String> result = new ArrayList<>();
-        RecordReader records = reader.rows();
-        StructObjectInspector inspector = (StructObjectInspector)reader.getObjectInspector();
-        StructField structField = inspector.getStructFieldRef(columnName);
-        Object row = null;
-        while(records.hasNext())
-        {
-            row = records.next(row);
-            Object o = inspector.getStructFieldData(row, structField);
-            String value;
-            if (o == null)
-                value = "";
-            else if (o instanceof BytesWritable bytesWritable)
-                value = new String(bytesWritable.copyBytes());
-            else
-                value = o.toString();
-            result.add(value);
+        RecordReader records = null;
+        try {
+            records = reader.rows();
+            StructObjectInspector inspector = (StructObjectInspector) reader.getObjectInspector();
+            StructField structField = inspector.getStructFieldRef(columnName);
+            Object row = null;
+            while (records.hasNext()) {
+                row = records.next(row);
+                Object o = inspector.getStructFieldData(row, structField);
+                String value;
+                if (o == null)
+                    value = "";
+                else if (o instanceof BytesWritable bytesWritable)
+                    value = new String(bytesWritable.copyBytes());
+                else
+                    value = o.toString();
+                result.add(value);
+            }
+        } finally {
+            if (records != null)
+                records.close();
         }
-
         return result;
     }
 }

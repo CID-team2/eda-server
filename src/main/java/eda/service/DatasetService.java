@@ -28,22 +28,32 @@ public class DatasetService {
                 .map(DatasetDto::of);
     }
 
-    public void createDatasetFromRemoteCSV(String datasetName, String url, String fileFormat) {
+    public DatasetDto createDatasetFromRemoteCSV(String datasetName, String url, String fileFormat,
+                                                 String[] additionalColumns, String[] additionalValues) {
         if (datasetRepository.findByName(datasetName).isPresent())
             throw new BadRequestException("Dataset '%s' already exists".formatted(datasetName));
         try {
-            InputStream stream;
-            if (fileFormat == null)
-                stream = new URL(url).openStream();
-            else if (fileFormat.equalsIgnoreCase("gz"))
-                stream = new GZIPInputStream(new URL(url).openStream());
-            else
-                throw new BadRequestException("Unsupported file format: %s".formatted(fileFormat));
-            Dataset dataset = Dataset.createFromCSV(datasetName, url, stream);
+            InputStream stream = streamFileFormat(new URL(url).openStream(), fileFormat);
+            Dataset dataset = Dataset.createFromCSV(datasetName, stream, url, additionalColumns, additionalValues);
             datasetRepository.save(dataset);
+            return DatasetDto.of(dataset);
         } catch (IOException e) {
             throw new BadRequestException("Cannot create dataset - " + e.toString());
         }
+    }
+
+    public Optional<DatasetDto> updateDatasetFromRemoteCSV(String datasetName, String url, String fileFormat,
+                                                           String[] additionalColumns, String[] additionalValues) {
+        Dataset dataset = datasetRepository.findByName(datasetName).orElseThrow(() ->
+            new BadRequestException("Dataset '%s' doesn't exist".formatted(datasetName)));
+        try {
+            InputStream stream = streamFileFormat(new URL(url).openStream(), fileFormat);
+            dataset.updateWithCSV(stream, url, additionalColumns, additionalValues);
+            datasetRepository.save(dataset);
+        } catch (IOException e) {
+            throw new BadRequestException("Cannot update dataset - " + e.toString());
+        }
+        return Optional.of(DatasetDto.of(dataset));
     }
 
     public Optional<Map<String, List<String>>> getDatasetExample(String datasetName, int count, boolean random) {
@@ -57,5 +67,14 @@ public class DatasetService {
             result.put(column.getName(), statistic.getExample(dataset, column.getName(), count, randomSeed));
         }
         return Optional.of(result);
+    }
+
+    private InputStream streamFileFormat(InputStream stream, String fileFormat) throws IOException {
+        if (fileFormat == null)
+            return stream;
+        else if (fileFormat.equalsIgnoreCase("gz"))
+            return new GZIPInputStream(stream);
+        else
+            throw new BadRequestException("Unsupported file format: %s".formatted(fileFormat));
     }
 }
