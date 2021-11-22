@@ -5,7 +5,6 @@ import eda.dto.DatasetDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.*;
 
@@ -14,7 +13,6 @@ import java.util.*;
 public class DatasetService {
     private final DatasetRepository datasetRepository;
     private final Statistic statistic;
-    private final DatasetCreator datasetCreator;
 
     public List<DatasetDto> getDatasetList() {
         return datasetRepository.findAll().stream()
@@ -29,7 +27,8 @@ public class DatasetService {
 
     public boolean createDataset(String datasetName, String csvFileName) {
         try {
-            datasetCreator.createDatasetFromCSV(datasetName, csvFileName);
+            Dataset dataset = Dataset.createDatasetFromCSV(datasetName, csvFileName);
+            datasetRepository.save(dataset);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

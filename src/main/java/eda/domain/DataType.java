@@ -5,6 +5,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public enum DataType {
     INT,
@@ -63,5 +64,20 @@ public enum DataType {
             case DATE -> list.stream().map(DataType::convertStringToDate).map(Object.class::cast).toList();
             case BOOL -> list.stream().map(DataType::convertStringToBoolean).map(Object.class::cast).toList();
         };
+    }
+
+    public static DataType inferType(List<String> data) {
+        long count = data.size();
+        long nonnullCount = DataType.STRING.convertStringList(data).size();
+        if (nonnullCount == 0)
+            return DataType.STRING;
+
+        for (DataType dataType : List.of(DataType.BOOL, DataType.DATE, DataType.INT, DataType.FLOAT)) {
+            List<Object> dataConverted = dataType.convertStringList(data);
+            long nullCount = dataConverted.stream().filter(Objects::isNull).count();
+            if ((double) (count - nullCount) / nonnullCount > 0.8)
+                return dataType;
+        }
+        return DataType.STRING;
     }
 }
