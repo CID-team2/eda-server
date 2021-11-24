@@ -3,6 +3,7 @@ package eda.service;
 import eda.domain.*;
 import eda.dto.DatasetDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class DatasetService {
@@ -56,6 +58,21 @@ public class DatasetService {
             throw new BadRequestException("Cannot update dataset - " + e.toString());
         }
         return Optional.of(DatasetDto.of(dataset));
+    }
+
+    public boolean deleteDataset(String datasetName) {
+        Optional<Dataset> datasetOptional = datasetRepository.findByName(datasetName);
+        if (datasetOptional.isEmpty())
+            return false;
+        Dataset dataset = datasetOptional.get();
+        try {
+            dataset.deleteFile();
+        } catch (IOException e) {
+            log.error("Dataset file delete failed");
+            log.error(e.toString());
+        }
+        datasetRepository.delete(dataset);
+        return true;
     }
 
     public Optional<Map<String, List<String>>> getDatasetExample(String datasetName, int count, boolean random) {

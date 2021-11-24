@@ -105,6 +105,10 @@ public class Dataset extends BaseTimeEntity {
         Files.delete(Path.of(tempFilePath));
     }
 
+    public void deleteFile() throws IOException {
+        Files.delete(Path.of(this.path));
+    }
+
     private static List<ColumnData> writeWithCSV(String path, InputStream input,
                                                  String[] additionalColumns,
                                                  String[] additionalValues) throws IOException {

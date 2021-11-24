@@ -58,6 +58,15 @@ public class DatasetController {
                 datasetService.updateDatasetFromRemoteCSV(datasetName, url, fileFormat, additionalColumns, additionalValues));
     }
 
+    @DeleteMapping("/{datasetName}")
+    public ResponseEntity<Void> deleteDataset(@PathVariable String datasetName) {
+        boolean success = datasetService.deleteDataset(datasetName);
+        if (success)
+            return ResponseEntity.noContent().build();
+        else
+            return ResponseEntity.notFound().build();
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({BadRequestException.class})
     public Map<String, String> badRequest(Exception e) {
