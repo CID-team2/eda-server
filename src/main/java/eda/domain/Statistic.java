@@ -142,7 +142,7 @@ public class Statistic {
         if (randomSeed != null) {
             this.random.setSeed(randomSeed);
             for (int i = 0; i < size; i++) {
-                result.add((String) values.get(this.random.nextInt(size)));
+                result.add((String) values.get(this.random.nextInt(values.size())));
             }
         }
         else {
