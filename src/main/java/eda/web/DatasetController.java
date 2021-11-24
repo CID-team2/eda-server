@@ -1,11 +1,14 @@
 package eda.web;
 
 import eda.dto.DatasetDto;
+import eda.service.BadRequestException;
 import eda.service.DatasetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,5 +37,41 @@ public class DatasetController {
                 count != null ? count : 10,
                 random != null ? random : false
                 ));
+    }
+
+    @PostMapping
+    public DatasetDto createDatasetFromRemoteCSV(
+            @RequestParam String name, @RequestParam String url,
+            @RequestParam(required = false, value = "file_format") String fileFormat,
+            @RequestParam(required = false, value = "additional_column") String[] additionalColumns,
+            @RequestParam(required = false, value = "additional_value") String[] additionalValues) {
+        return datasetService.createDatasetFromRemoteCSV(name, url, fileFormat, additionalColumns, additionalValues);
+    }
+
+    @PatchMapping("/{datasetName}")
+    public ResponseEntity<DatasetDto> updateDatasetFromRemoteCSV(
+            @PathVariable String datasetName, @RequestParam String url,
+            @RequestParam(required = false, value = "file_format") String fileFormat,
+            @RequestParam(required = false, value = "additional_column") String[] additionalColumns,
+            @RequestParam(required = false, value = "additional_value") String[] additionalValues) {
+        return ResponseEntity.of(
+                datasetService.updateDatasetFromRemoteCSV(datasetName, url, fileFormat, additionalColumns, additionalValues));
+    }
+
+    @DeleteMapping("/{datasetName}")
+    public ResponseEntity<Void> deleteDataset(@PathVariable String datasetName) {
+        boolean success = datasetService.deleteDataset(datasetName);
+        if (success)
+            return ResponseEntity.noContent().build();
+        else
+            return ResponseEntity.notFound().build();
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({BadRequestException.class})
+    public Map<String, String> badRequest(Exception e) {
+        Map<String, String> errorAttributes = new HashMap<>();
+        errorAttributes.put("message", e.getMessage());
+        return errorAttributes;
     }
 }

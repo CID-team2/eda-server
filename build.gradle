@@ -24,24 +24,27 @@ configurations {
 
 dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
-    implementation('org.projectlombok:lombok')
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation('com.h2database:h2')
+    implementation('org.springframework.boot:spring-boot-starter-validation')
     implementation('org.springframework.session:spring-session-jdbc')
+
+    implementation('com.h2database:h2')
     implementation('mysql:mysql-connector-java')
     implementation('org.mariadb.jdbc:mariadb-java-client')
+    implementation('com.vladmihalcea:hibernate-types-52:2.14.0')
+    implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.9')
+
+    implementation('org.projectlombok:lombok')
+
     implementation('org.apache.hive:hive-exec:2.3.0') {
         exclude group:'org.eclipse.jetty.aggregate', module: '*'
         exclude group:'org.apache.logging.log4j', module: 'log4j-slf4j-impl'
     }
-    implementation('org.springframework.boot:spring-boot-starter-validation')
-    implementation('com.vladmihalcea:hibernate-types-52:2.14.0')
-    implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.9')
+    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.9.0')
 
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation('org.projectlombok:lombok')
     testRuntimeOnly('mysql:mysql-connector-java')
-//    testImplementation('org.springframework.security:spring-security-test')
 
     annotationProcessor('org.projectlombok:lombok')
     testAnnotationProcessor('org.projectlombok:lombok')

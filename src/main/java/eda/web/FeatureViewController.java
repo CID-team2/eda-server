@@ -31,8 +31,8 @@ public class FeatureViewController {
     }
 
     @PostMapping
-    public void createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
-        featureViewService.createFeatureView(featureViewDto);
+    public FeatureViewDto createFeatureView(@RequestBody @Valid FeatureViewDto featureViewDto) {
+        return featureViewService.createFeatureView(featureViewDto);
     }
 
     @GetMapping("/{featureViewName}")
@@ -44,9 +44,9 @@ public class FeatureViewController {
     public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
         boolean result = featureViewService.deleteFeatureView(featureViewName);
         if (result)
-            return ResponseEntity.ok(null);
+            return ResponseEntity.noContent().build();
         else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/{featureViewName}/example")
