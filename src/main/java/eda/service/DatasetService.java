@@ -44,8 +44,10 @@ public class DatasetService {
 
     public Optional<DatasetDto> updateDatasetFromRemoteCSV(String datasetName, String url, String fileFormat,
                                                            String[] additionalColumns, String[] additionalValues) {
-        Dataset dataset = datasetRepository.findByName(datasetName).orElseThrow(() ->
-            new BadRequestException("Dataset '%s' doesn't exist".formatted(datasetName)));
+        Optional<Dataset> datasetOptional = datasetRepository.findByName(datasetName);
+        if (datasetOptional.isEmpty())
+            return Optional.empty();
+        Dataset dataset = datasetOptional.get();
         try {
             InputStream stream = streamFileFormat(new URL(url).openStream(), fileFormat);
             dataset.updateWithCSV(stream, url, additionalColumns, additionalValues);

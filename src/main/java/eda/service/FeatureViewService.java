@@ -36,19 +36,21 @@ public class FeatureViewService {
         );
     }
 
-    public void createFeatureView(FeatureViewDto featureViewDto) {
+    public FeatureViewDto createFeatureView(FeatureViewDto featureViewDto) {
         if (featureViewRepository.findByName(featureViewDto.getName()).isPresent())
             throw new BadRequestException("Feature view '%s' is already exist".formatted(featureViewDto.getName()));
 
         FeatureView featureView = convertFeatureViewDto(featureViewDto);
-        featureViewRepository.save(featureView);
+        featureView = featureViewRepository.save(featureView);
+        return FeatureViewDto.of(featureView);
     }
 
     public boolean deleteFeatureView(String featureViewName) {
         Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
         if (featureViewOptional.isEmpty())
             return false;
-        featureViewRepository.delete(featureViewOptional.get());
+        FeatureView featureView = featureViewOptional.get();
+        featureViewRepository.delete(featureView);
         return true;
     }
 
