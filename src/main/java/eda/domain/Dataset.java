@@ -22,7 +22,7 @@ import java.util.*;
 @Builder
 @Getter
 @Entity
-public class Dataset {
+public class Dataset extends BaseTimeEntity {
     private static final String DATA_PATH = "data";
 
     @Id
