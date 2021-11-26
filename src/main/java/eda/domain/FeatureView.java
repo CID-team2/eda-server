@@ -3,7 +3,7 @@ package eda.domain;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +19,5 @@ public class FeatureView extends BaseTimeEntity {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "feature_view_id")
-    private Set<Feature> features;
+    private List<Feature> features;
 }

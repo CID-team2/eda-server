@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -71,7 +70,7 @@ public class FeatureViewService {
         return FeatureView.builder()
                 .name(featureViewDto.getName())
                 .features(featureViewDto.getFeatures().stream().map(this::convertFeatureDto)
-                        .collect(Collectors.toSet()))
+                        .toList())
                 .build();
     }
 
@@ -87,7 +86,7 @@ public class FeatureViewService {
 
         return Feature.builder()
                 .children(featureDto.getChildren().stream().map(this::convertFeatureDto)
-                        .collect(Collectors.toSet()))
+                        .toList())
                 .name(featureDto.getName())
                 .dataset(dataset)
                 .column(datasetColumn)

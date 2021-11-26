@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Builder
@@ -16,7 +15,7 @@ public class DatasetDto {
     private final String name;
     private final String path;
     private final String source;
-    private final Set<DatasetColumnDto> columns;
+    private final List<DatasetColumnDto> columns;
 
     public static DatasetDto of(Dataset entity) {
         return DatasetDto.builder()
@@ -26,7 +25,7 @@ public class DatasetDto {
                 .source(entity.getSource())
                 .columns(entity.getColumns().stream()
                         .map(DatasetColumnDto::of)
-                        .collect(Collectors.toSet()))
+                        .toList())
                 .build();
     }
 }

@@ -5,8 +5,7 @@ import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Builder
@@ -29,10 +28,10 @@ public class FeatureDto {
     private final String feature_type;
 
     @Valid
-    private final Set<FeatureDto> children;
+    private final List<FeatureDto> children;
 
     @Valid
-    private final Set<String> tags;
+    private final List<String> tags;
 
     private final String description;
 
@@ -47,22 +46,22 @@ public class FeatureDto {
                 .children(
                         entity.getChildren().stream()
                                 .map(FeatureDto::of)
-                                .collect(Collectors.toSet())
+                                .toList()
                 )
                 .tags(entity.getTags())
                 .description(entity.getDescription())
                 .build();
     }
 
-    public Set<FeatureDto> getChildren() {
+    public List<FeatureDto> getChildren() {
         if (children == null)
-            return Set.of();
+            return List.of();
         else return children;
     }
 
-    public Set<String> getTags() {
+    public List<String> getTags() {
         if (tags == null)
-            return Set.of();
+            return List.of();
         else return tags;
     }
 }

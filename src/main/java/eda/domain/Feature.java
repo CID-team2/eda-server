@@ -19,7 +19,7 @@ public class Feature extends BaseTimeEntity {
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_id")
-    private Set<Feature> children;
+    private List<Feature> children;
 
     private String name;
 
@@ -38,7 +38,7 @@ public class Feature extends BaseTimeEntity {
 
     @ElementCollection
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))
-    private Set<String> tags;
+    private List<String> tags;
 
     private String description;
 

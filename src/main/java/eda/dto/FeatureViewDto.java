@@ -6,11 +6,9 @@ import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Builder
 @Getter
@@ -23,7 +21,7 @@ public class FeatureViewDto {
     @Valid
     @NotNull
     @Size(min = 1)
-    private final Set<FeatureDto> features;
+    private final List<FeatureDto> features;
 
     public static FeatureViewDto of(FeatureView entity) {
         return FeatureViewDto.builder()
@@ -31,7 +29,7 @@ public class FeatureViewDto {
                 .name(entity.getName())
                 .features(entity.getFeatures().stream()
                         .map(FeatureDto::of)
-                        .collect(Collectors.toSet())
+                        .toList()
                 )
                 .build();
     }

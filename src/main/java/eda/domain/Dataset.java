@@ -40,7 +40,7 @@ public class Dataset extends BaseTimeEntity {
     @Builder.Default
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "dataset_id")
-    private Set<DatasetColumn> columns = new HashSet<>();
+    private List<DatasetColumn> columns = new ArrayList<>();
 
     @Version
     private Long version;
