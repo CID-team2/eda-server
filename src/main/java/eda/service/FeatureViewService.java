@@ -44,6 +44,21 @@ public class FeatureViewService {
         return FeatureViewDto.of(featureView);
     }
 
+    public FeatureViewDto updateFeatureView(String featureViewName, FeatureViewDto featureViewDto) {
+        Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
+        if (featureViewOptional.isEmpty()) {
+            if (!featureViewName.equals(featureViewDto.getName()))
+                throw new BadRequestException("Names in path(%s) and DTO(%s) should be equal"
+                        .formatted(featureViewName, featureViewDto.getName()));
+            return createFeatureView(featureViewDto);
+        } else {
+            FeatureView featureView = featureViewOptional.get();
+            featureView.update(convertFeatureViewDto(featureViewDto));
+            featureView = featureViewRepository.save(featureView);
+            return FeatureViewDto.of(featureView);
+        }
+    }
+
     public boolean deleteFeatureView(String featureViewName) {
         Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
         if (featureViewOptional.isEmpty())

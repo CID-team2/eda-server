@@ -40,6 +40,12 @@ public class FeatureViewController {
         return ResponseEntity.of(featureViewService.getFeatureView(featureViewName));
     }
 
+    @PutMapping("/{featureViewName}")
+    public FeatureViewDto updateFeatureView(@PathVariable String featureViewName,
+                                                            @RequestBody @Valid FeatureViewDto featureViewDto) {
+        return featureViewService.updateFeatureView(featureViewName, featureViewDto);
+    }
+
     @DeleteMapping("/{featureViewName}")
     public ResponseEntity<Void> deleteFeatureView(@PathVariable String featureViewName) {
         boolean result = featureViewService.deleteFeatureView(featureViewName);

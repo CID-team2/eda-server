@@ -17,7 +17,13 @@ public class FeatureView extends BaseTimeEntity {
 
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "feature_view_id")
     private List<Feature> features;
+
+    public void update(FeatureView featureView) {
+        name = featureView.name;
+        features.clear();
+        features.addAll(featureView.getFeatures());
+    }
 }
