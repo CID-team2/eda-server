@@ -34,6 +34,8 @@ public class FeatureDto {
     @Valid
     private final Set<String> tags;
 
+    private final String description;
+
     public static FeatureDto of(Feature entity) {
         return FeatureDto.builder()
                 .id(entity.getId())
@@ -48,6 +50,7 @@ public class FeatureDto {
                                 .collect(Collectors.toSet())
                 )
                 .tags(entity.getTags())
+                .description(entity.getDescription())
                 .build();
     }
 

@@ -40,6 +40,8 @@ public class Feature extends BaseTimeEntity {
     @CollectionTable(name = "feature_tag", joinColumns = @JoinColumn(name = "feature_id"))
     private Set<String> tags;
 
+    private String description;
+
     public DataType getDataType() {
         return column.getDataType();
     }

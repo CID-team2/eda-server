@@ -93,6 +93,7 @@ public class FeatureViewService {
                 .column(datasetColumn)
                 .featureType(FeatureType.valueOf(featureDto.getFeature_type()))
                 .tags(featureDto.getTags())
+                .description(featureDto.getDescription())
                 .build();
     }
 }
