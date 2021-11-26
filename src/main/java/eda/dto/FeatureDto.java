@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -35,6 +36,9 @@ public class FeatureDto {
 
     private final String description;
 
+    private final LocalDateTime created_at;
+    private final LocalDateTime modified_at;
+
     public static FeatureDto of(Feature entity) {
         return FeatureDto.builder()
                 .id(entity.getId())
@@ -50,6 +54,8 @@ public class FeatureDto {
                 )
                 .tags(entity.getTags())
                 .description(entity.getDescription())
+                .created_at(entity.getCreatedAt())
+                .modified_at(entity.getModifiedAt())
                 .build();
     }
 

@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -16,6 +17,8 @@ public class DatasetDto {
     private final String path;
     private final String source;
     private final List<DatasetColumnDto> columns;
+    private final LocalDateTime created_at;
+    private final LocalDateTime modified_at;
 
     public static DatasetDto of(Dataset entity) {
         return DatasetDto.builder()
@@ -26,6 +29,8 @@ public class DatasetDto {
                 .columns(entity.getColumns().stream()
                         .map(DatasetColumnDto::of)
                         .toList())
+                .created_at(entity.getCreatedAt())
+                .modified_at(entity.getModifiedAt())
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -23,6 +24,9 @@ public class FeatureViewDto {
     @Size(min = 1)
     private final List<FeatureDto> features;
 
+    private final LocalDateTime created_at;
+    private final LocalDateTime modified_at;
+
     public static FeatureViewDto of(FeatureView entity) {
         return FeatureViewDto.builder()
                 .id(entity.getId())
@@ -31,6 +35,8 @@ public class FeatureViewDto {
                         .map(FeatureDto::of)
                         .toList()
                 )
+                .created_at(entity.getCreatedAt())
+                .modified_at(entity.getModifiedAt())
                 .build();
     }
 }
