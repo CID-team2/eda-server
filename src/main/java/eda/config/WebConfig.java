@@ -6,15 +6,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+
 @Slf4j
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Value("${cors-hostname}")
-    String hostName;
+    String[] hostName;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        log.info("CORS hostname: " + hostName);
+        log.info("CORS hostname: " + Arrays.toString(hostName));
         registry.addMapping("/**")
                 .allowedOrigins(hostName);
     }
