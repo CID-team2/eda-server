@@ -26,4 +26,18 @@ public class FeatureView extends BaseTimeEntity {
         features.clear();
         features.addAll(featureView.getFeatures());
     }
+
+    public boolean isValid() {
+        // duplicate feature name check
+        for (int i = 0; i < features.size() - 1; i++) {
+            for (int j = i + 1; j < features.size(); j++) {
+                String name1 = features.get(i).getName();
+                String name2 = features.get(j).getName();
+                if (name1.equals(name2))
+                    return false;
+            }
+        }
+
+        return true;
+    }
 }

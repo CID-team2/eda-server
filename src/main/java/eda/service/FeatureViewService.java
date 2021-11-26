@@ -40,6 +40,8 @@ public class FeatureViewService {
             throw new BadRequestException("Feature view '%s' is already exist".formatted(featureViewDto.getName()));
 
         FeatureView featureView = convertFeatureViewDto(featureViewDto);
+        if (!featureView.isValid())
+            throw new BadRequestException("FeatureViewDTO is not valid");
         featureView = featureViewRepository.save(featureView);
         return FeatureViewDto.of(featureView);
     }
@@ -53,6 +55,8 @@ public class FeatureViewService {
             return createFeatureView(featureViewDto);
         } else {
             FeatureView featureView = featureViewOptional.get();
+            if (!featureView.isValid())
+                throw new BadRequestException("FeatureViewDTO is not valid");
             featureView.update(convertFeatureViewDto(featureViewDto));
             featureView = featureViewRepository.save(featureView);
             return FeatureViewDto.of(featureView);
