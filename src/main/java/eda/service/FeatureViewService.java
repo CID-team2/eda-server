@@ -72,14 +72,29 @@ public class FeatureViewService {
         return true;
     }
 
-    public Optional<Map<String, List<String>>> getFeatureViewExample(String featureViewName, int count, boolean random) {
+    public Optional<Map<String, List<String>>> getFeatureViewExample(String featureViewName, String[] featureNames,
+                                                                     int count, boolean random) {
         Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
         if (featureViewOptional.isEmpty())
             return Optional.empty();
         FeatureView featureView = featureViewOptional.get();
+
+        List<Feature> targetFeatures;
+        if (featureNames != null) {
+            targetFeatures = new LinkedList<>();
+            for (String featureName : featureNames) {
+                Optional<Feature> featureOptional = getFeature(featureViewName, featureName);
+                if (featureOptional.isEmpty())
+                    return Optional.empty();
+                targetFeatures.add(featureOptional.get());
+            }
+        } else {
+            targetFeatures = featureView.getFeatures();
+        }
+
         Map<String, List<String>> result = new HashMap<>();
         Integer randomSeed = random ? new Random().nextInt() : null;
-        for (Feature feature : featureView.getFeatures()) {
+        for (Feature feature : targetFeatures) {
             result.put(feature.getColumnName(), statistic.getExample(feature, count, randomSeed));
         }
         return Optional.of(result);

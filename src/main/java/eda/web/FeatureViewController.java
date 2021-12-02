@@ -42,7 +42,7 @@ public class FeatureViewController {
 
     @PutMapping("/{featureViewName}")
     public FeatureViewDto updateFeatureView(@PathVariable String featureViewName,
-                                                            @RequestBody @Valid FeatureViewDto featureViewDto) {
+                                            @RequestBody @Valid FeatureViewDto featureViewDto) {
         return featureViewService.updateFeatureView(featureViewName, featureViewDto);
     }
 
@@ -57,9 +57,11 @@ public class FeatureViewController {
 
     @GetMapping("/{featureViewName}/example")
     public ResponseEntity<Map<String, List<String>>> getFeatureViewExample(@PathVariable String featureViewName,
+                                                                           @RequestParam(required = false) String[] feature,
                                                                            @RequestParam(required = false) Integer count,
                                                                            @RequestParam(required = false) Boolean random) {
         return ResponseEntity.of(featureViewService.getFeatureViewExample(featureViewName,
+                feature,
                 count != null ? count : 10,
                 random != null ? random : false
                 ));
