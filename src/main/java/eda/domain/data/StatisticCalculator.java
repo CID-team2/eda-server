@@ -69,9 +69,6 @@ public class StatisticCalculator {
         return mode;
     }
 
-    // TODO: add methods
-    // Boxplot
-    // used double values because I need to compute IQR and find whiskers, which is impossible when it is Number
     public static <T extends Number> Map<String, Object> getBoxplot(List<T> values) {
         if (values.isEmpty())
             return Map.of();
@@ -117,7 +114,7 @@ public class StatisticCalculator {
                 "upperWhisker", upperWhisker,
                 "upperOutliers", upperOutliers);
     }
-    // histogram
+
     public static <T extends Number> Map<String, Object> getHistogram(List<T> values, double start, double end, int breaks) {
         // 1. convert to double and 2. sort
         List<Double> doubleValues = new ArrayList<>(values.size());
@@ -158,7 +155,38 @@ public class StatisticCalculator {
                 "high_outliers", high_outliers
         );
     }
-    // bar plot
+
+    public static Map<String, Object> getBarPlot(List<Object> values, double threshold) {
+        final int size = values.size();
+        Map<Object, Integer> count = new HashMap<>();
+        for (Object object : values) {
+            if (count.containsKey(object))
+                count.put(object, count.get(object) + 1);
+            else
+                count.put(object, 1);
+        }
+
+        List<String> categories = new LinkedList<>();
+        List<Object> numbers = new LinkedList<>();
+        int othersCount = 0;
+        for (Map.Entry<Object, Integer> entry : count.entrySet()) {
+            Object key = entry.getKey();
+            int num = entry.getValue();
+            if ((double) num / size < threshold)
+                othersCount += num;
+            else {
+                categories.add(key.toString());
+                numbers.add(num);
+            }
+        }
+        return Map.of(
+                "categories", categories,
+                "numbers", numbers,
+                "total_number", size,
+                "unique_count", count.size(),
+                "others_count", othersCount
+        );
+    }
 
     private static <T extends Number> double getCovariance(List<T> values1, List<T> values2, double mean1, double mean2) {
         if (values1.size() != values2.size())

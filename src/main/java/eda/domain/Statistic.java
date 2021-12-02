@@ -95,6 +95,15 @@ public class Statistic {
                 yield StatisticCalculator.getHistogram(
                     values.stream().map(Number.class::cast).toList(), start, end, breaks);
             }
+            case BARPLOT -> {
+                double threshold;
+                try {
+                    threshold = Double.parseDouble((String) params.getOrDefault("threshold", "0.05"));
+                } catch (NullPointerException | NumberFormatException e) {
+                    throw new IllegalArgumentException("Cannot parse request param: " + e.getMessage());
+                }
+                yield StatisticCalculator.getBarPlot(values, threshold);
+            }
             case CORR_MATRIX -> throw new UnsupportedOperationException("Correlation matrix is for multiple features");
         };
     }
@@ -110,7 +119,7 @@ public class Statistic {
 
         return switch (kind) {
             case BASIC -> getBasicStatistic(features);
-            case BOXPLOT, HISTOGRAM -> throw new UnsupportedOperationException(kind.name() + " is for single feature");
+            case BOXPLOT, HISTOGRAM, BARPLOT -> throw new UnsupportedOperationException(kind.name() + " is for single feature");
             case CORR_MATRIX -> Map.of("matrix",
                     StatisticCalculator.getCorrMatrix(values.stream()
                             .map(l -> l.stream().map(Number.class::cast).toList())
@@ -216,10 +225,13 @@ public class Statistic {
                 Set.of(FeatureType.values()),
                 Set.of(Type.values())),
         BOXPLOT(Set.of(DataType.INT, DataType.FLOAT),
-                Set.of(FeatureType.QUANTITATIVE),
+                Set.of(FeatureType.QUANTITATIVE, FeatureType.ORDINAL),
                 Set.of(Type.SINGLE)),
         HISTOGRAM(Set.of(DataType.INT, DataType.FLOAT),
                 Set.of(FeatureType.QUANTITATIVE),
+                Set.of(Type.SINGLE)),
+        BARPLOT(Set.of(DataType.values()),
+                Set.of(FeatureType.ORDINAL, FeatureType.CATEGORICAL),
                 Set.of(Type.SINGLE)),
         CORR_MATRIX(Set.of(DataType.INT, DataType.FLOAT),
                 Set.of(FeatureType.QUANTITATIVE),
