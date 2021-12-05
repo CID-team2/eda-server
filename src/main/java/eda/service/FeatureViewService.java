@@ -5,6 +5,7 @@ import eda.dto.FeatureDto;
 import eda.dto.FeatureViewDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -46,6 +47,7 @@ public class FeatureViewService {
         return FeatureViewDto.of(featureView);
     }
 
+    @Transactional
     public FeatureViewDto updateFeatureView(String featureViewName, FeatureViewDto featureViewDto) {
         Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
         if (featureViewOptional.isEmpty()) {
@@ -63,6 +65,7 @@ public class FeatureViewService {
         }
     }
 
+    @Transactional
     public boolean deleteFeatureView(String featureViewName) {
         Optional<FeatureView> featureViewOptional = featureViewRepository.findByName(featureViewName);
         if (featureViewOptional.isEmpty())
