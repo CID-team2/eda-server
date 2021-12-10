@@ -81,7 +81,7 @@ public class Statistic {
             case BOXPLOT -> StatisticCalculator.getBoxplot(values.stream().map(Number.class::cast).toList());
             case HISTOGRAM -> {
                 Map<String, Object> boxplot =
-                        getStatisticFromEntity(feature, StatisticRequestDto.builder().name("boxplot").build());
+                        getStatisticFromEntity(List.of(feature), StatisticRequestDto.builder().name("boxplot").build());
                 double start;
                 double end;
                 int breaks;
@@ -112,7 +112,7 @@ public class Statistic {
         if (features.size() == 1)
             return getStatistic(features.get(0), statisticRequestDto);
 
-        checkValidRequest(features, statisticRequestDto.getName());
+        features = checkValidRequest(features, statisticRequestDto.getName());
         Kind kind = Kind.valueOf(statisticRequestDto.getName().toUpperCase());
 
         List<List<Object>> values = getNonnullRows(readFeatures(features));
@@ -120,14 +120,22 @@ public class Statistic {
         return switch (kind) {
             case BASIC -> getBasicStatistic(features);
             case BOXPLOT, HISTOGRAM, BARPLOT -> throw new UnsupportedOperationException(kind.name() + " is for single feature");
-            case CORR_MATRIX -> Map.of("matrix",
-                    StatisticCalculator.getCorrMatrix(values.stream()
-                            .map(l -> l.stream().map(Number.class::cast).toList())
-                            .toList()));
+            case CORR_MATRIX -> {
+                double[][] matrix = StatisticCalculator.getCorrMatrix(values.stream()
+                        .map(l -> l.stream().map(Number.class::cast).toList())
+                        .toList());
+                List<String> featureNames = features.stream().map(Feature::getName).toList();
+                yield Map.of("matrix", matrix,
+                        "features", featureNames);
+            }
         };
     }
 
-    public Map<String, Object> getStatisticFromEntity(Feature feature, StatisticRequestDto statisticRequestDto) {
+    public Map<String, Object> getStatisticFromEntity(List<Feature> features, StatisticRequestDto statisticRequestDto) {
+        if (features.size() != 1)
+            return getStatistic(features, statisticRequestDto);
+
+        Feature feature = features.get(0);
         Map<String, Object> params = statisticRequestDto.getParams();
         if (params != null && !params.isEmpty())
             return getStatistic(feature, statisticRequestDto);
@@ -166,8 +174,9 @@ public class Statistic {
         return getExample(feature.getDataset(), feature.getColumnName(), count, randomSeed);
     }
 
-    public void checkValidRequest(List<Feature> features, String statistic)
+    public List<Feature> checkValidRequest(List<Feature> features, String statistic)
             throws UnsupportedOperationException {
+        List<Feature> result = new LinkedList<>(features);
         Kind kind;
 
         // check statistic exists
@@ -178,13 +187,10 @@ public class Statistic {
         }
 
         // check statistic is valid for all featureType and dataType
-        for (Feature feature : features) {
-            if (!kind.supports(feature.getDataType(), feature.getFeatureType()))
-                throw new UnsupportedOperationException(
-                        "'%s' is not supported with DataType '%s', FeatureType '%s'".formatted(
-                                statistic, feature.getDataType(), feature.getFeatureType()
-                        ));
-        }
+        result.removeIf(feature -> !kind.supports(feature.getDataType(), feature.getFeatureType()));
+        if (result.isEmpty())
+            throw new UnsupportedOperationException("The type(s) of feature(s) given do not match the statistic");
+        return result;
     }
 
     private List<List<Object>> readFeatures(List<Feature> features) {

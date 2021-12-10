@@ -69,7 +69,7 @@ public class FeatureViewController {
 
     @GetMapping("/{featureViewName}/statistic")
     public ResponseEntity<Map<String, Object>> getStatistic(@PathVariable String featureViewName,
-                                                            @RequestParam List<String> feature,
+                                                            @RequestParam(required = false) List<String> feature,
                                                             @RequestParam(required = false) String statistic,
                                                             HttpServletRequest req) {
         Map<String, String[]> params = req.getParameterMap();
