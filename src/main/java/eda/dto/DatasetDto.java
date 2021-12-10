@@ -17,6 +17,7 @@ public class DatasetDto {
     private final String path;
     private final String source;
     private final List<DatasetColumnDto> columns;
+    private final long num_records;
     private final LocalDateTime created_at;
     private final LocalDateTime modified_at;
 
@@ -29,6 +30,7 @@ public class DatasetDto {
                 .columns(entity.getColumns().stream()
                         .map(DatasetColumnDto::of)
                         .toList())
+                .num_records(entity.getNumRecords())
                 .created_at(entity.getCreatedAt())
                 .modified_at(entity.getModifiedAt())
                 .build();

@@ -43,6 +43,8 @@ public class Dataset extends BaseTimeEntity {
     @JoinColumn(name = "dataset_id")
     private List<DatasetColumn> columns = new ArrayList<>();
 
+    private Long numRecords;
+
     @Version
     private Long version;
 
@@ -75,6 +77,7 @@ public class Dataset extends BaseTimeEntity {
                 .name(datasetName)
                 .path(path)
                 .source(source)
+                .numRecords((long) columns.get(0).data.size())
                 .build();
         for (ColumnData column : columns) {
             dataset.addColumn(column.name, column.dataType);
@@ -101,6 +104,7 @@ public class Dataset extends BaseTimeEntity {
         ORCWriter.merge(newFilePath, header, List.of(oldFilePath, tempFilePath));
         this.path = newFilePath;
         this.source = this.source + ";" + source;
+        this.numRecords += columns.get(0).data.size();
 
         Files.delete(Path.of(oldFilePath));
         Files.delete(Path.of(tempFilePath));
