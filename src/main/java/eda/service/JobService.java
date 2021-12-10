@@ -1,6 +1,8 @@
 package eda.service;
 
 import eda.domain.DatasetColumn;
+import eda.domain.StatisticEntity;
+import eda.domain.StatisticEntityRepository;
 import eda.domain.worker.Job;
 import eda.domain.worker.JobRepository;
 import eda.dto.JobDto;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @Service
 public class JobService {
     private final JobRepository jobRepository;
+    private final StatisticEntityRepository statisticEntityRepository;
 
     public void addJobs(List<DatasetColumn> jobs) {
         jobRepository.saveAll(
@@ -50,9 +53,14 @@ public class JobService {
         Job job = jobColumnOptional.get();
         if (job.getStatus() == Job.Status.WAITING)
             return false;
-        else {
-            jobRepository.delete(job);
-            return true;
+
+        // refuse when statistic is not calculated
+        for (StatisticEntity se : statisticEntityRepository.findAllByColumn()) {
+            if (se.getModifiedAt().isBefore(job.getModifiedAt()))
+                return false;
         }
+
+        jobRepository.delete(job);
+        return true;
     }
 }
