@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
@@ -23,7 +24,6 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "worker", name = "enabled", havingValue = "true")
-@EnableScheduling
 @Component
 public class Worker {
     @Value("${worker.api.hostname:http://localhost:8080}")
@@ -37,25 +37,29 @@ public class Worker {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Scheduled(fixedDelayString = "${worker.schedule.interval:600}")
+    @Scheduled(fixedDelayString = "${worker.schedule.interval:60000}")
     public void fetchAndProcessJob() {
-        while (true) {
-            Optional<JobDto> fetched = fetchJob();
-            if (fetched.isEmpty())
-                return;
-            JobDto jobDto = fetched.get();
-            Optional<DatasetColumn> columnOptional = columnRepository.findById(jobDto.getDataset_column_id());
-            if (columnOptional.isEmpty())
-                continue;
+        try {
+            while (true) {
+                Optional<JobDto> fetched = fetchJob();
+                if (fetched.isEmpty())
+                    return;
+                JobDto jobDto = fetched.get();
+                Optional<DatasetColumn> columnOptional = columnRepository.findById(jobDto.getDataset_column_id());
+                if (columnOptional.isEmpty())
+                    continue;
 
-            DatasetColumn column = columnOptional.get();
-            processJob(column);
+                DatasetColumn column = columnOptional.get();
+                processJob(column);
 
-            Boolean success = reportJob(jobDto.getId());
-            if (success != null && success)
-                log.info("Job finished: " + jobDto);
-            else
-                log.error("Job report failed");
+                Boolean success = reportJob(jobDto.getId());
+                if (success != null && success)
+                    log.info("Job finished: " + jobDto);
+                else
+                    log.error("Job report failed");
+            }
+        } catch (ResourceAccessException e) {
+            log.error("Cannot access to server: " + e);
         }
     }
 

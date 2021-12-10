@@ -139,6 +139,8 @@ public class Statistic {
             return getStatistic(feature, statisticRequestDto);
 
         StatisticEntity statisticEntity = statisticEntityOptional.get();
+        if (statisticEntity.getModifiedAt().isAfter(feature.getDataset().getModifiedAt()))
+            return getStatistic(feature, statisticRequestDto);
         Map<String, Object> result = new HashMap<>(statisticEntity.getValue());
         result.put("calculated_at", statisticEntity.getModifiedAt());
         return result;
@@ -203,8 +205,8 @@ public class Statistic {
 
         for (int i = 0; i < values.get(0).size(); i++) {
             boolean nonnull = true;
-            for (int j = 0; j < values.size(); j++) {
-                if (values.get(j).get(i) == null) {
+            for (List<Object> value : values) {
+                if (value.get(i) == null) {
                     nonnull = false;
                     break;
                 }
@@ -254,7 +256,7 @@ public class Statistic {
         }
 
         public enum Type {
-            SINGLE, MULTIPLE;
+            SINGLE, MULTIPLE
         }
     }
 }
