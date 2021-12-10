@@ -139,7 +139,7 @@ public class Statistic {
             return getStatistic(feature, statisticRequestDto);
 
         StatisticEntity statisticEntity = statisticEntityOptional.get();
-        if (statisticEntity.getModifiedAt().isAfter(feature.getDataset().getModifiedAt()))
+        if (statisticEntity.getModifiedAt().isBefore(feature.getDataset().getModifiedAt()))
             return getStatistic(feature, statisticRequestDto);
         Map<String, Object> result = new HashMap<>(statisticEntity.getValue());
         result.put("calculated_at", statisticEntity.getModifiedAt());
