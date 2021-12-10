@@ -19,6 +19,7 @@ import java.util.zip.GZIPInputStream;
 public class DatasetService {
     private final DatasetRepository datasetRepository;
     private final Statistic statistic;
+    private final JobService jobService;
 
     public List<DatasetDto> getDatasetList() {
         return datasetRepository.findAll().stream()
@@ -39,9 +40,10 @@ public class DatasetService {
             InputStream stream = streamFileFormat(new URL(url).openStream(), fileFormat);
             Dataset dataset = Dataset.createFromCSV(datasetName, stream, url, additionalColumns, additionalValues);
             datasetRepository.save(dataset);
+            jobService.addJobs(dataset.getColumns());
             return DatasetDto.of(dataset);
         } catch (IOException e) {
-            throw new BadRequestException("Cannot create dataset - " + e.toString());
+            throw new BadRequestException("Cannot create dataset - " + e);
         }
     }
 
@@ -56,8 +58,9 @@ public class DatasetService {
             InputStream stream = streamFileFormat(new URL(url).openStream(), fileFormat);
             dataset.updateWithCSV(stream, url, additionalColumns, additionalValues);
             datasetRepository.save(dataset);
+            jobService.addJobs(dataset.getColumns());
         } catch (IOException e) {
-            throw new BadRequestException("Cannot update dataset - " + e.toString());
+            throw new BadRequestException("Cannot update dataset - " + e);
         }
         return Optional.of(DatasetDto.of(dataset));
     }
