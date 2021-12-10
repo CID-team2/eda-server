@@ -35,6 +35,7 @@ public class Dataset extends BaseTimeEntity {
     @Column(nullable = false)
     private String path;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String source;
 
     @Builder.Default
