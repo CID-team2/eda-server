@@ -43,7 +43,9 @@ public class LRUCachedDataReader implements DataReader {
             return Collections.emptyList();
         }
         List<Object> values = dataType.convertStringList(valuesString);
-        cache.put(key, values, calculateSize(valuesString, dataType));
+        int size = calculateSize(valuesString, dataType);
+        if (size < DEFAULT_CACHE_SIZE)
+            cache.put(key, values, size);
         return values;
     }
 
