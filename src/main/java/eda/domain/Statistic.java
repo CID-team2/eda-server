@@ -155,17 +155,20 @@ public class Statistic {
     }
 
     public List<String> getExample(Dataset dataset, String columnName, int count, Integer randomSeed) {
-        List<Object> values = dataReader.read(dataset.getPath(), columnName, DataType.STRING);
-        List<String> result = new ArrayList<>();
-        final int size = Math.min(values.size(), count);
+        List<String> result = new LinkedList<>();
         if (randomSeed != null) {
+            List<Object> values = dataReader.read(dataset.getPath(), columnName, DataType.STRING);
+            final int size = Math.min(values.size(), count);
             this.random.setSeed(randomSeed);
             for (int i = 0; i < size; i++) {
                 result.add((String) values.get(this.random.nextInt(values.size())));
             }
         }
         else {
-            result = values.stream().limit(size).map(String.class::cast).toList();
+            result = dataReader.readN(dataset.getPath(), columnName, DataType.STRING, count)
+                    .stream()
+                    .map(String.class::cast)
+                    .toList();
         }
         return result;
     }

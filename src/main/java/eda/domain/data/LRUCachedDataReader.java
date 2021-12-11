@@ -49,6 +49,26 @@ public class LRUCachedDataReader implements DataReader {
         return values;
     }
 
+    @Override
+    public List<Object> readN(String path, String columnName, DataType dataType, int count) {
+        CacheKey key = new CacheKey(path, columnName, dataType);
+        Optional<List<Object>> cached = cache.get(key);
+        if (cached.isPresent()) {
+            List<Object> list = cached.get();
+            return list.subList(0, Math.min(count, list.size()));
+        }
+
+        List<String> valuesString;
+        try {
+            ORCReader orcReader = new ORCReader(path);
+            valuesString = orcReader.readColumnN(columnName, count);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+        return dataType.convertStringList(valuesString);
+    }
+
     public void clearCache() {
         cache.clear();
     }

@@ -41,6 +41,10 @@ public class ORCReader {
     }
 
     public List<String> readColumn(String columnName) throws IOException {
+        return readColumnN(columnName, Integer.MAX_VALUE);
+    }
+
+    public List<String> readColumnN(String columnName, int count) throws IOException {
         List<String> result = new ArrayList<>();
         RecordReader records = null;
         try {
@@ -48,7 +52,8 @@ public class ORCReader {
             StructObjectInspector inspector = (StructObjectInspector) reader.getObjectInspector();
             StructField structField = inspector.getStructFieldRef(columnName);
             Object row = null;
-            while (records.hasNext()) {
+            int i = 0;
+            while (records.hasNext() && ++i <= count) {
                 row = records.next(row);
                 Object o = inspector.getStructFieldData(row, structField);
                 String value;
