@@ -19,3 +19,8 @@ Build & Run
 서버가 실행 되면 `localhost:8080` (또는 Docker daemon이 실행되는 호스트) 주소로 접근 가능합니다.
 
     curl localhost:8080/api/v1/feature-views
+    
+Build & Run with Docker Compose
+-----------
+    docker build -t clovafeast-eda-server:latest eda-server
+    docker-compose up -d
