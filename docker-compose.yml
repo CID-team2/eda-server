@@ -3,6 +3,8 @@ services:
   myapp:
     image: clovafeast-eda-server:latest
     container_name: myapp
+    volumes:
+      - /home/docker/volumes/myapp/myapp/:/opt/eda-server/data/
     depends_on:
       - mysql
     environment:
@@ -26,18 +28,36 @@ services:
       - MYSQL_DATABASE=eda
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8
 
-  worker:
+  worker1:
     image: clovafeast-eda-server:latest
-    container_name: worker
+    container_name: worker1
+    volumes:
+      - /home/docker/volumes/myapp/myapp/:/opt/eda-server/data/
     depends_on:
       - mysql
     environment:
       SPRING_APPLICATION_JSON: '{
             "spring.datasource.url": "jdbc:mysql://mysql:3306/eda?useUnicode=true&characterEncoding=utf8&useSSL=false",
-            "spring.jpa.hibernate.ddl-auto": "update",
-            "spring.session.jdbc.initialize-schema": "always",
 
             "spring.main.web-application-type": "none",
             "worker.enabled": "true",
-            "worker.schedule.interval": "86400000"
+            "worker.schedule.interval": "600000",
+            "worker.api.hostname": "http://myapp:8080"
+          }'
+
+  worker2:
+    image: clovafeast-eda-server:latest
+    container_name: worker2
+    volumes:
+      - /home/docker/volumes/myapp/myapp/:/opt/eda-server/data/
+    depends_on:
+      - mysql
+    environment:
+      SPRING_APPLICATION_JSON: '{
+            "spring.datasource.url": "jdbc:mysql://mysql:3306/eda?useUnicode=true&characterEncoding=utf8&useSSL=false",
+
+            "spring.main.web-application-type": "none",
+            "worker.enabled": "true",
+            "worker.schedule.interval": "600000",
+            "worker.api.hostname": "http://myapp:8080"
           }'
